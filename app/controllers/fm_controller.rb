@@ -4,27 +4,27 @@ class FmController < ApplicationController
   include GridAuthentication
 
   def show
-    # Mirrors Api::ReleasesController#latest and #coming_soon (the two
-    # fetches the React landing page made on mount).
-    @latest_releases = Release.includes(:artist, cover_image_attachment: :blob)
-      .where(label: "hackr.fm", coming_soon: false)
-      .where.associated(:cover_image_attachment)
-      .order(Arel.sql("release_date DESC NULLS LAST"))
-      .reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }
-      .first(3)
+    @catalog = label_catalog
+    @latest_releases = @catalog.select { |r| r.cover_image.attached? }.first(3)
 
-    @coming_soon = Release.includes(:artist, cover_image_attachment: :blob)
+    @coming_soon = Release.includes(:artist, :tracks, cover_image_attachment: :blob)
       .where(coming_soon: true)
       .order(Arel.sql("release_date ASC NULLS LAST"))
+      .to_a
+
+    @artist_count = Artist.bands.count
   end
 
   def releases
-    # Mirrors Api::ReleasesController#index; the label filter and the
-    # release_date DESC sort the React page applied client-side are folded
-    # into the query (same semantics: exact label match, NULLS LAST).
-    @releases = Release.includes(:artist, cover_image_attachment: :blob)
+    @releases = label_catalog
+  end
+
+  private
+
+  def label_catalog
+    Release.includes(:artist, :tracks, cover_image_attachment: :blob)
       .where(label: "hackr.fm", coming_soon: false)
       .order(Arel.sql("release_date DESC NULLS LAST"))
-      .reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }
+      .reject(&:vault_hidden?)
   end
 end

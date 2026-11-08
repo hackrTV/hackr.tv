@@ -1260,144 +1260,40 @@ body.theater-open { overflow: hidden; }
   50% { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 }
 
-/* Landing window (FmLandingPage.tsx) */
-.fm-window {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: block;
-  background: var(--bg-2);
-  border: 2px solid var(--accent);
-}
-.fm-fieldset { border-color: var(--accent); }
-.fm-legend { color: var(--accent); }
-.fm-body { padding: 30px; }
+/* Console screens: 120px (band 64px) cover tiles beside name / artist / meta lines */
+.console--fm { --console-tag: 11ch; } /* [PLAYLISTS] */
+.console--fnet > * { --xt-brand: var(--ok); } /* on the children: console.css (loaded later) sets .console's own --xt-brand */
+.console--fnet .console-bar-title { color: var(--xt-brand); }
+.console--fm .console-status, .console--fnet .console-status { padding: 4px 8px 0; }
 
-.fm-heading { text-align: center; margin-bottom: 5px; color: var(--accent); font-size: 1.8em; }
-.fm-tagline { text-align: center; color: var(--fg-faint); margin-bottom: 30px; font-size: 0.9em; }
+.fm-tile { display: grid; grid-template-columns: 5ch 120px minmax(0, 1fr); gap: 0 16px; align-items: start; padding: 6px 8px; }
+.fm-tile[hidden] { display: none; }
+.fm-tile:hover, .fm-tile:focus-within { background: var(--bg-1); }
+.fm-tile .console-tag { grid-area: auto; } /* console.css's phone rule names a "tag" area for .console-row; this grid has none */
+.fm-tile--band { grid-template-columns: 5ch 64px minmax(0, 1fr); }
+.fm-cover { display: block; position: relative; box-sizing: border-box; width: 120px; height: 120px; overflow: hidden; }
+.fm-tile--band .fm-cover { width: 64px; height: 64px; }
+.fm-cover-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.fm-cover-none { display: flex; box-sizing: border-box; width: 100%; height: 100%; align-items: center; justify-content: center; border: 1px solid var(--edge); color: var(--fg-faint); font-size: 40px; line-height: 1; }
+.fm-tile--band .fm-cover-none { font-size: 20px; }
+.fm-text { min-width: 0; padding-top: 2px; }
+.fm-name { display: block; color: var(--xt-brand); font-size: 18px; line-height: 22px; font-weight: bold; letter-spacing: 1px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-name:hover { color: var(--fg-bright); text-decoration: underline; }
+.fm-artist { color: var(--fg-muted); }
+.fm-desc { max-width: 100ch; margin-top: 2px; color: var(--fg-muted); font-size: 14px; line-height: 18px; }
+.fm-meta { margin-top: 4px; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.fm-genre { color: var(--accent-alt); }
+.fm-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; letter-spacing: 1px; }
+.console-row .fm-tag--radio { color: var(--err); }
+.console-row .fm-tag--vault { color: var(--accent-bright); }
+.console-row .fm-tag--fnet { color: var(--ok); }
 
-.fm-lore {
-  margin-bottom: 30px;
-  padding: 20px;
-  background: var(--bg-0);
-  border: 1px solid var(--edge);
-  line-height: 1.8;
-}
-.fm-lore-open { color: var(--fg); margin-bottom: 15px; }
-.fm-lore-mid { color: #aaa; margin-bottom: 15px; }
-.fm-lore-em { color: var(--accent); }
-.fm-lore-close { color: var(--fg-muted); }
-
-.fm-section { margin-bottom: 30px; }
-.fm-section-title {
-  color: var(--accent);
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.1em;
-  letter-spacing: 2px;
-}
-
-/* Latest releases grid + shared release card (also used on /fm/releases) */
-.fm-latest-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.fm-card-link { display: block; text-decoration: none; color: inherit; }
-.fm-release-card {
-  background: var(--bg-1);
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.15);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  cursor: pointer;
-}
-.fm-release-card:hover {
-  box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4);
-  transform: scale(1.02);
-}
-.fm-cover {
-  width: 100%;
-  aspect-ratio: 1;
-  background: var(--bg-1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.fm-cover-img { width: 100%; height: 100%; object-fit: cover; }
-.fm-cover-placeholder { color: var(--edge); font-size: 3em; font-family: var(--font-tui); }
-.fm-release-info { padding: 12px; }
-.fm-release-name { color: var(--accent); font-weight: bold; font-size: 1em; margin-bottom: 4px; }
-.fm-release-artist { color: #999; font-size: 0.85em; margin-bottom: 6px; }
-.fm-release-meta { display: flex; justify-content: space-between; align-items: center; }
-.fm-release-type { color: var(--fg-faint); font-size: 0.8em; }
-.fm-release-date { color: var(--fg-faint); font-size: 0.8em; }
-
-.fm-viewall-row { text-align: center; margin-top: 20px; }
-.fm-viewall-btn {
-  display: inline-block;
-  padding: 10px 25px;
-  background: transparent;
-  color: var(--accent);
-  text-decoration: none;
-  border: 1px solid var(--accent);
-  letter-spacing: 2px;
-  font-size: 0.9em;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.fm-viewall-btn:hover { background: var(--accent); color: white; }
-
-.fm-divider { border-top: 1px solid var(--edge); margin-bottom: 25px; }
-
-/* Coming soon (SIGNAL INCOMING) */
-.fm-signal-title {
-  color: var(--accent);
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.1em;
-  letter-spacing: 3px;
-  animation: signal-pulse 2s ease-in-out infinite;
-  cursor: default;
-  user-select: none;
-}
-.fm-soon-grid { display: grid; gap: 15px; }
-.fm-soon-grid--cols-1 { grid-template-columns: repeat(1, 1fr); }
-.fm-soon-grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
-.fm-soon-grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
-.fm-soon-grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
-.fm-soon-card-link { display: block; text-decoration: none; color: inherit; }
-.fm-soon-card-link[hidden] { display: none; }
-.fm-soon-card {
-  background: var(--bg-0);
-  border: 1px solid var(--accent);
-  animation: border-glow 3s ease-in-out infinite;
-  transition: transform 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-.fm-soon-card:hover { transform: scale(1.02); }
-.fm-soon-card:hover img { animation: glitch-shift 0.3s ease-in-out 3; }
-.fm-soon-cover {
-  width: 100%;
-  aspect-ratio: 1;
-  background: var(--bg-1);
-  position: relative;
-  overflow: hidden;
-}
-.fm-soon-cover-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(0.5) brightness(0.6) contrast(1.1);
-}
-.fm-soon-cover-placeholder {
-  color: var(--edge);
-  font-size: 2em;
-  font-family: var(--font-tui);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
+/* Incoming covers keep the animated card treatment on the cover box; the rule's title is the signal-code click target */
+.fm-signal { color: var(--accent-bright); cursor: default; user-select: none; animation: signal-pulse 2s ease-in-out infinite; }
+.fm-cover--incoming { border: 1px solid var(--accent); animation: border-glow 3s ease-in-out infinite; }
+.fm-cover--incoming .fm-cover-img { filter: saturate(0.5) brightness(0.6) contrast(1.1); }
+.fm-cover--incoming .fm-cover-none { border: none; }
+.fm-tile:hover .fm-cover--incoming .fm-cover-img { animation: glitch-shift 0.3s ease-in-out 3; }
 .fm-soon-scanlines {
   position: absolute;
   inset: 0;
@@ -1413,19 +1309,25 @@ body.theater-open { overflow: hidden; }
 }
 .fm-soon-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 4px;
+  right: 4px;
   background: rgba(var(--accent-rgb), 0.85);
   color: #fff;
-  padding: 2px 8px;
-  font-size: 0.65em;
-  letter-spacing: 2px;
+  padding: 0 4px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 1px;
   font-weight: bold;
 }
-.fm-soon-info { padding: 10px; }
-.fm-soon-name { color: var(--accent); font-weight: bold; font-size: 0.9em; margin-bottom: 3px; }
-.fm-soon-artist { color: var(--fg-muted); font-size: 0.75em; margin-bottom: 4px; }
-.fm-soon-meta { color: var(--fg-faint); font-size: 0.7em; letter-spacing: 1px; }
+
+@media (max-width: 767px) {
+  .fm-tile { grid-template-columns: 4ch 80px minmax(0, 1fr); gap: 0 10px; }
+  .fm-tile--band { grid-template-columns: 4ch 48px minmax(0, 1fr); }
+  .fm-cover { width: 80px; height: 80px; }
+  .fm-tile--band .fm-cover { width: 48px; height: 48px; }
+  .fm-name { font-size: 16px; line-height: 20px; white-space: normal; }
+  .fm-desc { font-size: 12px; line-height: 16px; }
+}
 
 /* Signal code modal */
 .fm-code-overlay {
@@ -1511,148 +1413,6 @@ body.theater-open { overflow: hidden; }
   letter-spacing: 1px;
 }
 
-/* Nav cards (RADIO / VAULT / FNET) */
-.fm-nav-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 30px;
-}
-.fm-nav-card-link { display: block; height: 100%; text-decoration: none; }
-.fm-nav-card { background: var(--bg-1); cursor: pointer; height: 100%; }
-.fm-nav-card fieldset { height: 100%; }
-.fm-nav-body { padding: 15px; }
-.fm-nav-big { font-size: 1.4em; margin-bottom: 10px; text-align: center; }
-.fm-nav-desc { color: #999; font-size: 0.9em; line-height: 1.6; }
-.fm-nav-card--radio { border: 1px solid var(--err); }
-.fm-nav-card--radio fieldset { border-color: var(--err); }
-.fm-nav-card--radio legend { color: var(--err); }
-.fm-nav-card--radio .fm-nav-big { color: var(--err); }
-.fm-nav-card--vault { border: 1px solid #a855f7; }
-.fm-nav-card--vault fieldset { border-color: #a855f7; }
-.fm-nav-card--vault legend { color: #a855f7; }
-.fm-nav-card--vault .fm-nav-big { color: #a855f7; }
-.fm-nav-card--fnet { border: 1px solid #10b981; }
-.fm-nav-card--fnet fieldset { border-color: #10b981; }
-.fm-nav-card--fnet legend { color: #10b981; }
-.fm-nav-card--fnet .fm-nav-big { color: #10b981; }
-
-.fm-footer { text-align: center; padding: 15px; border-top: 1px solid var(--edge); }
-.fm-footer p { color: var(--fg-faint); font-size: 0.85em; }
-
-@media (max-width: 767px) {
-  .fm-window { max-width: 100%; }
-  .fm-body { padding: 15px; }
-  .fm-heading { font-size: 1.3em; }
-  .fm-lore { padding: 15px; }
-  .fm-latest-grid { grid-template-columns: 1fr; gap: 15px; }
-  .fm-soon-grid { gap: 10px; }
-  .fm-soon-grid--cols-1,
-  .fm-soon-grid--cols-2,
-  .fm-soon-grid--cols-3,
-  .fm-soon-grid--cols-4 { grid-template-columns: repeat(2, 1fr); }
-  .fm-nav-grid { grid-template-columns: 1fr; gap: 15px; }
-  .fm-nav-body { padding: 10px; }
-}
-
-/* Releases catalog window (FmReleasesPage.tsx) */
-.fmr-window {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: block;
-  background: var(--bg-2);
-  border: 2px solid var(--accent);
-}
-.fmr-fieldset { border-color: var(--accent); }
-.fmr-legend { color: var(--accent); letter-spacing: 3px; }
-.fmr-empty {
-  padding: 40px;
-  text-align: center;
-  background: rgba(var(--accent-rgb), 0.05);
-  border: 1px solid rgba(var(--accent-rgb), 0.2);
-}
-.fmr-empty p { color: #aaa; }
-.fmr-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-.fmr-release-info { padding: 15px; }
-.fmr-release-name {
-  color: var(--accent);
-  font-weight: bold;
-  font-size: 1.1em;
-  margin-bottom: 4px;
-  text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
-}
-.fmr-catalog { color: var(--fg-faint); font-size: 0.8em; margin-top: 3px; font-family: var(--font-tui); }
-.fmr-nav-row { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
-.fmr-nav-back {
-  padding: 10px 20px;
-  background: #222;
-  color: var(--fg-muted);
-  text-decoration: none;
-  border: 1px solid var(--edge-bright);
-}
-.fmr-nav-vault {
-  padding: 10px 20px;
-  background: var(--accent);
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);
-}
-
-@media (max-width: 767px) {
-  .fmr-window { max-width: 100%; }
-  .fmr-grid { grid-template-columns: 1fr; }
-}
-
-/* FNet roster window (BandsPage.tsx) */
-.fnet-window {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: block;
-  background: var(--bg-2);
-  border: 2px solid var(--fg-faint);
-}
-.fnet-fieldset { border-color: var(--fg-faint); }
-.fnet-legend { color: #10b981; }
-.fnet-heading { text-align: center; margin-bottom: 15px; color: #10b981; }
-.fnet-infobox { margin-bottom: 30px; padding: 15px; background: var(--bg-0); border: 1px solid var(--edge-bright); }
-.fnet-infobox p { color: #999; text-align: center; }
-.fnet-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
-}
-.fnet-card { background: var(--bg-1); border: 1px solid var(--edge-bright); }
-.fnet-card fieldset { border-color: var(--fg-faint); }
-.fnet-card legend { color: #10b981; }
-.fnet-card-body { padding: 15px; }
-.fnet-desc-wrap { margin-bottom: 20px; }
-.fnet-desc { color: #aaa; line-height: 1.6; font-style: italic; font-size: 1em; }
-.fnet-genre-box { margin-bottom: 15px; padding: 10px; background: var(--bg-0); border: 1px solid var(--edge); }
-.fnet-genre-box p { color: var(--fg-faint); font-size: 0.85em; }
-.fnet-genre { color: var(--fg-muted); font-weight: bold; }
-.fnet-actions { margin-top: 20px; display: flex; gap: 10px; }
-.fnet-btn { flex: 1; text-align: center; font-size: 1em; }
-.fnet-btn--disabled { opacity: 0.5; cursor: not-allowed; }
-.fnet-empty { padding: 40px; text-align: center; background: var(--bg-2); }
-.fnet-empty p { color: #999; font-size: 1.2em; }
-.fnet-about { margin-top: 30px; padding: 20px; background: var(--bg-0); border: 1px solid var(--edge); }
-.fnet-about h3 { margin-bottom: 10px; color: #10b981; }
-.fnet-about p { line-height: 1.6; color: var(--fg-muted); }
-
-@media (max-width: 767px) {
-  .fnet-window { max-width: 100%; }
-  .fnet-grid { grid-template-columns: 1fr; gap: 15px; }
-  .fnet-card-body { padding: 10px; }
-  .fnet-desc-wrap { margin-bottom: 12px; }
-  .fnet-desc { font-size: 0.9em; }
-  .fnet-actions { margin-top: 12px; }
-  .fnet-btn { font-size: 0.85em; }
-}
 .nav-terminal-button { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; display: block; width: 100%; text-align: left; }
 
 /* The hover peek panel (.peek, peek controller) lives in console.css

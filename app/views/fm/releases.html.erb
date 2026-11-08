@@ -1,51 +1,70 @@
 <% content_for :title, "Releases — hackr.fm — hackr.tv" %>
+<% rows = @releases.each_with_index.map { |release, i| [release, format("%02d", i + 1)] } %>
+<% latest = @releases.first %>
+<% destinations = [
+  ["FM", "/fm", "hackr.fm", "The label's home frequency"],
+  ["RADIO", "/fm/radio", "Radio", "Live stations broadcasting around the clock"],
+  ["VAULT", "/vault", "Pulse Vault", "Every track on the label, ready to play"],
+  ["FNET", "/f/net", "Fracture Network", "The artists behind the releases"],
+  ["HOME", "/", "hackr.tv", "Back to the broadcast system"]
+] %>
 
-<%= render layout: "shared/default_chrome" do %>
-  <div class="tui-window white-text fmr-window">
-    <fieldset class="fmr-fieldset">
-      <legend class="center fmr-legend">hackr.fm :: RELEASES</legend>
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="console console--fm" data-controller="terminal" data-boot="pending"
+    data-action="keydown@document->terminal#skip click->terminal#skip">
+    <div class="console-bar console-line" data-terminal-target="line">
+      <h1 class="console-bar-title">HACKR.FM</h1>
+      <span class="console-bar-sub">RELEASES · THE LABEL RECORD</span>
+      <span class="console-bar-right">
+        <%= link_to "[<] FM", "/fm", class: "console-bar-link" %>
+        <%= link_to "[>] VAULT", "/vault", class: "console-bar-link" %>
+      </span>
+    </div>
 
-      <div>
-        <% if @releases.empty? %>
-          <div class="fmr-empty">
-            <p>No releases cataloged yet.</p>
-          </div>
-        <% else %>
-          <div class="fmr-grid">
-            <% @releases.each do |release| %>
-              <%= nav_link_to "/#{release.artist.slug}/releases/#{release.slug}", css_class: "fm-card-link" do %>
-                <div class="fm-release-card">
-                  <div class="fm-cover">
-                    <% if release.cover_image.attached? %>
-                      <%= image_tag url_for(release.cover_image), alt: release.name, class: "fm-cover-img" %>
-                    <% else %>
-                      <div class="fm-cover-placeholder">&#9834;</div>
-                    <% end %>
-                  </div>
-                  <div class="fmr-release-info">
-                    <div class="fmr-release-name"><%= release.name %></div>
-                    <div class="fm-release-artist"><%= release.artist.name %></div>
-                    <div class="fm-release-meta">
-                      <span class="fm-release-type"><%= release.release_type&.upcase || "RELEASE" %> · <%= pluralize(release.tracks.count, "track") %></span>
-                      <% if release.release_date %>
-                        <span class="fm-release-date"><%= release.release_date %></span>
-                      <% end %>
-                    </div>
-                    <% if release.catalog_number.present? %>
-                      <div class="fmr-catalog"><%= release.catalog_number %></div>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
-        <% end %>
-
-        <div class="fmr-nav-row">
-          <%= nav_link_to "/fm", css_class: "fmr-nav-back" do %>← hackr.fm<% end %>
-          <%= nav_link_to "/vault", css_class: "fmr-nav-vault" do %>PULSE VAULT →<% end %>
-        </div>
+    <div class="console-status">
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">CATALOG</span>
+        <span class="console-val">
+          <% if @releases.any? %>
+            <%= pluralize(@releases.size, "release") %> <span class="console-dim">· <%= pluralize(@releases.sum { |r| r.tracks.size }, "track") %> · <%= pluralize(@releases.map(&:artist_id).uniq.size, "artist") %></span>
+          <% else %>
+            <span class="console-dim">NONE CATALOGED</span>
+          <% end %>
+        </span>
       </div>
-    </fieldset>
+      <% if latest %>
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">LATEST</span>
+          <span class="console-val"><%= link_to latest.name, "/#{latest.artist.slug}/releases/#{latest.slug}", class: "console-link" %> <span class="console-dim">· <%= latest.artist.name %> · <%= latest.release_type&.upcase || "RELEASE" %><% if latest.release_date %> · <%= latest.release_date.strftime("%Y-%m-%d") %><% end %></span></span>
+        </div>
+      <% end %>
+    </div>
+
+    <section class="console-section" aria-label="Catalog">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// CATALOG //</span></div>
+      <% if rows.empty? %>
+        <p class="cc-empty console-line" data-terminal-target="line">NO RELEASES CATALOGED YET <span class="console-dim">· the signal is still forming</span></p>
+      <% end %>
+      <% rows.each do |(release, num)| %>
+        <%= render "fm/tile", release: release, num: num %>
+      <% end %>
+    </section>
+
+    <section class="console-section" aria-label="Destinations">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// DESTINATIONS //</span></div>
+      <% destinations.each do |tag_name, href, name, desc| %>
+        <div class="console-row console-line" data-terminal-target="line">
+          <span class="console-tag">[<%= tag_name %>]</span>
+          <%= link_to name, href, class: "console-link", data: {command: tag_name.downcase} %>
+          <span class="console-desc"><%= desc %></span>
+        </div>
+      <% end %>
+    </section>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// EVERY TRANSMISSION COMMITTED TO RECORD //</span></div>
+    <%= render "shared/console_prompt", hint: safe_join([
+      *(rows.any? ? ["type a release number ", tag.span("(#{rows.size > 8 ? "#{rows.first.last}–#{rows.last.last}" : rows.map(&:last).join(" ")})", class: "console-dim"), " or "] : []),
+      "type a tag ", tag.span("(#{destinations.map { |tag_name, *| tag_name.downcase }.join(" ")})", class: "console-dim"), " · enter · ? help"
+    ]) %>
   </div>
 <% end %>

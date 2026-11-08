@@ -1,0 +1,24 @@
+<% incoming = local_assigns.fetch(:incoming, false) %>
+<% locked = local_assigns.fetch(:locked, false) %>
+<% href = "/#{release.artist.slug}/releases/#{release.slug}" %>
+<% cover = release.cover_image.attached? %>
+<%= tag.div class: ["fm-tile", "console-line", ("fm-locked" if locked)], hidden: locked, data: {terminal_target: "line"} do %>
+  <span class="console-tag">[<%= num %>]</span>
+  <%= link_to href, class: ["fm-cover", ("fm-cover--incoming" if incoming)], tabindex: -1, aria: {hidden: true}, data: (cover && !incoming ? peek_attrs(url_for(release.cover_large)) : {}) do %>
+    <% if cover %>
+      <%= image_tag url_for(release.cover_standard), alt: "", class: "fm-cover-img" %>
+    <% else %>
+      <span class="fm-cover-none">&#9834;</span>
+    <% end %>
+    <% if incoming %>
+      <span class="fm-soon-scanlines"></span>
+      <span class="fm-soon-tint"></span>
+      <span class="fm-soon-badge">INCOMING</span>
+    <% end %>
+  <% end %>
+  <div class="fm-text">
+    <%= link_to release.name, href, class: "fm-name", data: {command: num} %>
+    <div class="fm-artist"><%= release.artist.name %></div>
+    <div class="fm-meta"><%= release.release_type&.upcase || "RELEASE" %><% if incoming %> · <span class="xt-brand">PENDING TRANSMISSION</span><% elsif release.release_date %> · <%= release.release_date.strftime("%Y-%m-%d") %><% end %> · <%= pluralize(release.tracks.size, "track") %><% if release.catalog_number.present? %> · <%= release.catalog_number %><% end %></div>
+  </div>
+<% end %>

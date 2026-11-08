@@ -1,72 +1,102 @@
 <% content_for :title, "Fracture Network — hackr.tv" %>
+<% current_year = Date.current.year %>
+<% future_year = current_year + 100 %>
+<% rows = @artists.each_with_index.map { |artist, i| [artist, format("%02d", i + 1)] } %>
+<% destinations = [
+  ["FM", "/fm", "hackr.fm", "The label's home frequency"],
+  ["RELEASES", "/fm/releases", "Releases", "Every release on the label, newest first"],
+  ["VAULT", "/vault", "Pulse Vault", "Every track from the network, ready to play"],
+  ["HOME", "/", "hackr.tv", "Back to the broadcast system"]
+] %>
 
-<%= render layout: "shared/default_chrome" do %>
-  <% current_year = Date.current.year %>
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="console console--fnet" data-controller="terminal" data-boot="pending"
+    data-action="keydown@document->terminal#skip click->terminal#skip">
+    <div class="console-bar console-line" data-terminal-target="line">
+      <h1 class="console-bar-title">FRACTURE NETWORK</h1>
+      <span class="console-bar-sub">THE ROSTER · <%= pluralize(@artists.size, "artist").upcase %> BROADCASTING</span>
+      <span class="console-bar-right">
+        <%= link_to "[<] FM", "/fm", class: "console-bar-link" %>
+        <%= link_to "[>] VAULT", "/vault", class: "console-bar-link" %>
+      </span>
+    </div>
 
-  <div class="tui-window white-text fnet-window">
-    <fieldset class="fnet-fieldset">
-      <legend class="center fnet-legend">
-        <span class="chrome-desktop-only">hackr.fm :: FRACTURE NETWORK</span>
-        <span class="chrome-mobile-only">FRACTURE NETWORK</span>
-      </legend>
-
-      <div>
-        <h2 class="fnet-heading">[:: FRACTURE NETWORK ::]</h2>
-
-        <div class="fnet-infobox">
-          <p><%= @artists.size %> artists broadcasting from the underground | Each with a story, each with a frequency</p>
-        </div>
-
-        <% if @artists.any? %>
-          <div class="fnet-grid">
-            <% @artists.each do |artist| %>
-              <div class="tui-window white-text fnet-card">
-                <fieldset>
-                  <legend><%= artist.name.to_s.upcase %></legend>
-
-                  <div class="fnet-card-body">
-                    <div class="fnet-desc-wrap">
-                      <p class="fnet-desc"><%= band_description(artist.slug) %></p>
-                    </div>
-
-                    <div class="fnet-genre-box">
-                      <p><span class="fnet-genre"><%= artist.genre %></span> • <%= artist.tracks.count %> tracks</p>
-                    </div>
-
-                    <div class="fnet-actions">
-                      <% profile_path = artist_profile_path_for(artist) %>
-                      <% if profile_path.present? %>
-                        <%= nav_link_to profile_path, css_class: tui_button_classes(:purple, "fnet-btn") do %>
-                          <span class="chrome-desktop-only">VIEW PROFILE</span>
-                          <span class="chrome-mobile-only">PROFILE</span>
-                        <% end %>
-                      <% else %>
-                        <button class="tui-button fnet-btn fnet-btn--disabled" disabled>COMING SOON</button>
-                      <% end %>
-
-                      <%= nav_link_to "/#{artist.slug}/releases", css_class: tui_button_classes(:cyan, "fnet-btn") do %>RELEASES<% end %>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="fnet-empty">
-            <p>No artists in the Fracture Network yet.</p>
-          </div>
-        <% end %>
-
-        <div class="fnet-about">
-          <h3>[:: ABOUT THE FRACTURE NETWORK ::]</h3>
-          <p>
-            These bands carry truth and beauty through time under the loose banner of the Fracture Network.
-            Every artist here is connected to THE PULSE GRID — creating, collaborating, and carrying forward
-            an uncompromising artistic vision that no system can contain. From <%= current_year %> to <%= current_year + 100 %>, the signal
-            continues.
-          </p>
-        </div>
+    <div class="console-status">
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">NETWORK</span>
+        <span class="console-val"><%= pluralize(@artists.size, "artist") %> <span class="console-dim">· <%= pluralize(@releases_by_artist.values.sum { |releases| releases.sum { |r| r.tracks.size } }, "track") %> · each with a story, each with a frequency</span></span>
       </div>
-    </fieldset>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">ORIGIN</span>
+        <span class="console-val"><%= current_year %> → <%= future_year %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">SIGNAL</span>
+        <span class="console-val"><span class="xt-brand">● BROADCASTING</span> <span class="console-dim">· from the underground</span></span>
+      </div>
+    </div>
+
+    <section class="console-section" aria-label="Roster">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// ROSTER //</span></div>
+      <% if rows.empty? %>
+        <p class="cc-empty console-line" data-terminal-target="line">NO ARTISTS ON THE NETWORK YET</p>
+      <% end %>
+      <% rows.each do |(artist, num)| %>
+        <% releases = @releases_by_artist.fetch(artist.id, []) %>
+        <% cover = releases.find { |r| r.cover_image.attached? } %>
+        <% profile_path = artist_profile_path_for(artist) %>
+        <% releases_path = "/#{artist.slug}/releases" %>
+        <div class="fm-tile fm-tile--band console-line" data-terminal-target="line">
+          <span class="console-tag">[<%= num %>]</span>
+          <%= link_to profile_path.presence || releases_path, class: "fm-cover", tabindex: -1, aria: {hidden: true}, data: (cover ? peek_attrs(url_for(cover.cover_large)) : {}) do %>
+            <% if cover %>
+              <%= image_tag url_for(cover.cover_standard), alt: "", class: "fm-cover-img" %>
+            <% else %>
+              <span class="fm-cover-none">&#9834;</span>
+            <% end %>
+          <% end %>
+          <div class="fm-text">
+            <%= link_to artist.name, profile_path.presence || releases_path, class: "fm-name", data: {command: num} %>
+            <div class="fm-desc"><%= band_description(artist.slug) %></div>
+            <div class="fm-meta"><% if artist.genre.present? %><span class="fm-genre"><%= artist.genre.upcase %></span> · <% end %><%= pluralize(releases.sum { |r| r.tracks.size }, "track") %> · <%= pluralize(releases.size, "release") %></div>
+            <div class="fm-actions">
+              <% if profile_path.present? %>
+                <%= link_to "[>] PROFILE", profile_path, class: "console-bar-link" %>
+              <% else %>
+                <span class="console-dim">PROFILE COMING SOON</span>
+              <% end %>
+              <%= link_to "[>] RELEASES", releases_path, class: "console-bar-link" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </section>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// ABOUT THE FRACTURE NETWORK //</span></div>
+    <div class="xt-prose">
+      <p class="console-line" data-terminal-target="line">
+        These bands carry truth and beauty through time under the loose banner of the Fracture Network.
+        Every artist here is connected to THE PULSE GRID — creating, collaborating, and carrying forward
+        an uncompromising artistic vision that no system can contain.
+        <span class="xt-brand">From <%= current_year %> to <%= future_year %>, the signal continues.</span>
+      </p>
+    </div>
+
+    <section class="console-section" aria-label="Destinations">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// DESTINATIONS //</span></div>
+      <% destinations.each do |tag_name, href, name, desc| %>
+        <div class="console-row console-line" data-terminal-target="line">
+          <span class="console-tag">[<%= tag_name %>]</span>
+          <%= link_to name, href, class: "console-link", data: {command: tag_name.downcase} %>
+          <span class="console-desc"><%= desc %></span>
+        </div>
+      <% end %>
+    </section>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// THE SIGNAL CONTINUES //</span></div>
+    <%= render "shared/console_prompt", hint: safe_join([
+      *(rows.any? ? ["type an artist number ", tag.span("(#{rows.size > 8 ? "#{rows.first.last}–#{rows.last.last}" : rows.map(&:last).join(" ")})", class: "console-dim"), " or "] : []),
+      "type a tag ", tag.span("(#{destinations.map { |tag_name, *| tag_name.downcase }.join(" ")})", class: "console-dim"), " · enter · ? help"
+    ]) %>
   </div>
 <% end %>
