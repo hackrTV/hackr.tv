@@ -7,13 +7,15 @@
 #  artist_type :string           default("band"), not null
 #  genre       :string
 #  name        :string
+#  position    :integer
 #  slug        :string
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #
 # Indexes
 #
-#  index_artists_on_slug  (slug) UNIQUE
+#  index_artists_on_position  (position)
+#  index_artists_on_slug      (slug) UNIQUE
 #
 require "rails_helper"
 
@@ -38,6 +40,34 @@ RSpec.describe Artist, type: :model do
       Artist.create!(name: "First Artist", slug: "unique-slug")
       duplicate = Artist.new(name: "Second Artist", slug: "unique-slug")
       expect(duplicate).not_to be_valid
+    end
+  end
+
+  describe "position" do
+    it "allows a blank or non-negative whole number" do
+      expect(build(:artist, position: nil)).to be_valid
+      expect(build(:artist, position: 0)).to be_valid
+      expect(build(:artist, position: -1)).not_to be_valid
+      expect(build(:artist, position: 1.5)).not_to be_valid
+    end
+  end
+
+  describe ".ordered" do
+    it "lists positioned artists by position, then the rest by name case-insensitively" do
+      zed = create(:artist, name: "Zed", position: 1)
+      alpha = create(:artist, name: "alpha", position: 2)
+      bravo = create(:artist, name: "Bravo")
+      charlie = create(:artist, name: "charlie")
+      ace = create(:artist, name: "Ace", position: 0)
+
+      expect(Artist.ordered.to_a).to eq([ace, zed, alpha, bravo, charlie])
+    end
+
+    it "breaks a tie on position and name by id" do
+      first = create(:artist, name: "echo", position: 1)
+      second = create(:artist, name: "Echo", position: 1)
+
+      expect(Artist.ordered.to_a).to eq([first, second])
     end
   end
 

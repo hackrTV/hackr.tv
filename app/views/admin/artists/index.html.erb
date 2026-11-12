@@ -36,7 +36,7 @@
         <span class="console-tag">[<%= num %>]</span>
         <div class="cc-text">
           <%= link_to artist.name, edit_admin_artist_path(artist), class: "console-link cc-name", data: {command: num} %>
-          <div class="cc-meta"><%= artist.slug %> · <%= artist.artist_type.upcase %><% if artist.genre.present? %> · <%= artist.genre %><% end %></div>
+          <div class="cc-meta"><%= artist.slug %> · <%= artist.artist_type.upcase %><% if artist.genre.present? %> · <%= artist.genre %><% end %><% if artist.position %> · POS <%= artist.position %><% end %></div>
         </div>
         <span class="rc-cell rc-cell--r"><%= pluralize(artist.releases.size, "release") %></span>
         <span class="rc-cell rc-cell--r"><%= pluralize(artist.tracks.size, "track") %></span>
