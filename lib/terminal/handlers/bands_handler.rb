@@ -66,7 +66,7 @@ module Terminal
       end
 
       def list_bands
-        bands = Artist.bands.order(:name)
+        bands = Artist.bands.ordered
 
         println ""
         println renderer.divider("BANDS ON THE NETWORK", width: 60, color: :green)
@@ -197,7 +197,7 @@ module Terminal
           return
         end
 
-        bands = Artist.bands.where("LOWER(name) LIKE ? OR LOWER(genre) LIKE ?", "%#{query.downcase}%", "%#{query.downcase}%")
+        bands = Artist.bands.ordered.where("LOWER(name) LIKE ? OR LOWER(genre) LIKE ?", "%#{query.downcase}%", "%#{query.downcase}%")
 
         println ""
         println renderer.divider("SEARCH: #{query}", width: 60, color: :green)

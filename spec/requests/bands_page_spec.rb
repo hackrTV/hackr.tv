@@ -28,6 +28,19 @@ RSpec.describe "Bands page", type: :request do
       expect(body).to include("(01 02)", "(fm releases vault home)")
     end
 
+    it "lists positioned bands first, in position order, ahead of the alphabetical rest" do
+      create(:artist, name: "Alpha Band", slug: "alpha-band", artist_type: "band")
+      create(:artist, name: "Zulu Band", slug: "zulu-band", artist_type: "band", position: 2)
+      create(:artist, name: "Yankee Band", slug: "yankee-band", artist_type: "band", position: 1)
+
+      get "/f/net"
+
+      body = response.body
+      expect(body).to include(%(data-command="01" href="/yankee-band/releases">Yankee Band</a>))
+      expect(body).to include(%(data-command="02" href="/zulu-band/releases">Zulu Band</a>))
+      expect(body).to include(%(data-command="03" href="/alpha-band/releases">Alpha Band</a>))
+    end
+
     it "links a band with a profile page to it, and one without to its releases" do
       create(:artist, name: "System Rot", slug: "system-rot", artist_type: "band")
       create(:artist, name: "Unprofiled", slug: "unprofiled", artist_type: "band")

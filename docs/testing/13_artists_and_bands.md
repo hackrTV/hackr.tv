@@ -86,7 +86,9 @@ minutes: 20
 
 9. Visit `/f/net`. → The roster as a console screen: bar `FRACTURE
    NETWORK` in green with `[<] FM` / `[>] VAULT`, NETWORK / ORIGIN /
-   SIGNAL rows, `// ROSTER //` of `[NN]` band tiles in name order (64px
+   SIGNAL rows, `// ROSTER //` of `[NN]` band tiles — bands with a
+   POSITION set in `/root/artists` first, lowest first, then the rest in
+   case-insensitive name order (64px
    newest released cover, or a `♪` box for a band with none; green name;
    description; cyan genre · tracks · releases; `[>] PROFILE` or
    `PROFILE COMING SOON`, `[>] RELEASES`), the about paragraph, the

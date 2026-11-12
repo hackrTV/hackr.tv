@@ -104,6 +104,27 @@ RSpec.describe "Admin artists", type: :request do
     expect(Artist.find_by(slug: "fresh-act")).to have_attributes(artist_type: "ost", genre: "Noise")
   end
 
+  it "saves a position from the record's POSITION row and prints it on the ledger" do
+    create(:artist, slug: "fresh-act", name: "Fresh Act")
+    create(:artist, slug: "loose-act", name: "Loose Act")
+    log_in!(admin)
+
+    get "/root/artists/fresh-act/edit"
+    expect(response.body).to include('name="artist[position]"')
+
+    patch "/root/artists/fresh-act", params: {artist: {position: "3"}}
+    expect(response).to redirect_to("/root/artists/fresh-act/edit")
+    expect(Artist.find_by(slug: "fresh-act").position).to eq(3)
+
+    get "/root/artists"
+    expect(response.body).to include("fresh-act · BAND · Electronic · POS 3")
+    expect(response.body).to include("loose-act · BAND · Electronic</div>")
+
+    patch "/root/artists/fresh-act", params: {artist: {position: "-1"}}
+    expect(response).to have_http_status(:unprocessable_entity)
+    expect(Artist.find_by(slug: "fresh-act").position).to eq(3)
+  end
+
   it "re-renders a rejected save against the saved slug" do
     create(:artist, slug: "fresh-act")
     log_in!(admin)

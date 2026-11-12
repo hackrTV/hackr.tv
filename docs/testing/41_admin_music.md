@@ -16,14 +16,19 @@ what you touch.
 ## Steps — artists
 
 1. `/root` → Music → Artists. → The ARTISTS console: ON RECORD / CATALOG
-   readouts, `// ARTISTS //` rows (`[NN]` · name over slug · TYPE · genre
-   · releases · tracks · `[EDIT] [HISTORY]`), destinations, the prompt.
+   readouts, `// ARTISTS //` rows in name order (`[NN]` · name over slug ·
+   TYPE · genre · `POS n` when set · releases · tracks · `[EDIT]
+   [HISTORY]`), destinations, the prompt.
    Type a row's number at the prompt + Enter. → The artist's record
    screen opens (a full page load; the admin has no Turbo).
-2. On the record: NAME / SLUG / TYPE / GENRE rows, `// COMMIT //`,
-   `// RELEASES //` rows for the artist + `[+] NEW RELEASE`. Change GENRE,
-   `[SAVE ARTIST]`. → Stays on the record with `[OK] Artist '…' updated.`;
-   `[HISTORY]` lists the change. Restore the genre.
+2. On the record: NAME / SLUG / TYPE / GENRE / POSITION rows,
+   `// COMMIT //`, `// RELEASES //` rows for the artist + `[+] NEW
+   RELEASE`. Change GENRE, `[SAVE ARTIST]`. → Stays on the record with
+   `[OK] Artist '…' updated.`; `[HISTORY]` lists the change. Restore the
+   genre. Set POSITION to `0` on a band that sorts late alphabetically and
+   save. → The ledger row reads `POS 0`; `/f/net` lists that band as
+   `[01]`. A negative position is refused with `[ERR]`. Blank the
+   position again to restore A–Z.
 3. Blank the NAME and save. → `[ERR]` reply, the form re-renders on the
    saved slug (no 404 / no broken action). `[CANCEL]` leaves.
 4. `[DELETE ARTIST]` shows only for an artist with no releases or tracks

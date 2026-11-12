@@ -11,7 +11,7 @@ module Api
         Artist.bands
       end
 
-      render json: @artists.order(:name).map { |artist|
+      render json: @artists.ordered.map { |artist|
         {
           id: artist.id,
           name: artist.name,

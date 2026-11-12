@@ -7,4 +7,6 @@
   <%= f.rc_select :artist_type, Artist::ARTIST_TYPES.map { |t| [t.upcase, t] }, {}, label: "TYPE",
     hint: "BAND is listed on /f/net · OST and VOICEOVER stay off the directory (the vault is independent)" %>
   <%= f.rc_text_field :genre, autocomplete: "off", placeholder: "Industrial / Dark Synth" %>
+  <%= f.rc_number_field :position, width: :short, min: 0,
+    hint: "lower lists first on /f/net · blank falls back to A–Z after the positioned artists" %>
 </div>

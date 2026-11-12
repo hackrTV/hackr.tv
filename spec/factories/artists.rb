@@ -7,13 +7,15 @@
 #  artist_type :string           default("band"), not null
 #  genre       :string
 #  name        :string
+#  position    :integer
 #  slug        :string
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #
 # Indexes
 #
-#  index_artists_on_slug  (slug) UNIQUE
+#  index_artists_on_position  (position)
+#  index_artists_on_slug      (slug) UNIQUE
 #
 FactoryBot.define do
   factory :artist do
