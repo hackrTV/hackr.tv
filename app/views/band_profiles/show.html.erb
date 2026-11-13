@@ -1,14 +1,13 @@
-<% if @profile %>
-  <% content_for :title, "#{@profile[:name]} — hackr.tv" %>
-<% end %>
+<% name = @profile ? @profile[:name] : (@artist&.name || @slug.upcase) %>
+<% content_for :title, "#{name} — hackr.tv" %>
 
 
 <%# ERB port of BandProfileLayout.tsx. The React page mounts DefaultLayout
     with its defaults, so the ascii header stays on.
     Band colors come from the css modifier class in band_profiles.css.
     bio-credit mirrors the SPA bio_viewed POST and no-ops when logged out
-    or when the slug value is blank. %>
-<%= render layout: "shared/default_chrome", locals: {} do %>
+    or when the slug value is blank. The Coming Soon console drops it. %>
+<%= render layout: "shared/default_chrome", locals: {ascii: @profile.present?} do %>
   <% if @profile %>
     <div class="tui-window white-text band-profile-container <%= @profile[:css] %>" data-controller="bio-credit" data-bio-credit-slug-value="<%= @artist&.slug %>">
       <fieldset class="band-profile-fieldset">
@@ -29,6 +28,6 @@
       </fieldset>
     </div>
   <% else %>
-    <%= render "not_found" %>
+    <%= render "coming_soon", name: name %>
   <% end %>
 <% end %>

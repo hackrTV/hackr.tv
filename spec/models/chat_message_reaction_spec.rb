@@ -2,6 +2,27 @@ require "rails_helper"
 
 # Uplink reactions (Phase 2 item 7): the row, the grouping the chips
 # render from, the chip-row broadcast, and the emote/packet cascades.
+# == Schema Information
+#
+# Table name: chat_message_reactions
+# Database name: primary
+#
+#  id              :integer          not null, primary key
+#  emote_slug      :string(32)       not null
+#  created_at      :datetime         not null
+#  chat_message_id :integer          not null
+#  grid_hackr_id   :integer          not null
+#
+# Indexes
+#
+#  index_chat_message_reactions_on_grid_hackr_id  (grid_hackr_id)
+#  index_chat_message_reactions_unique            (chat_message_id,grid_hackr_id,emote_slug) UNIQUE
+#
+# Foreign Keys
+#
+#  chat_message_id  (chat_message_id => chat_messages.id) ON DELETE => cascade
+#  grid_hackr_id    (grid_hackr_id => grid_hackrs.id) ON DELETE => cascade
+#
 RSpec.describe ChatMessageReaction, type: :model do
   let(:channel) { create(:chat_channel, slug: "ambient") }
   let(:packet) { create(:chat_message, chat_channel: channel, content: "react to me") }

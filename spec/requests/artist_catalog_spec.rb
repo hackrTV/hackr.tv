@@ -572,4 +572,37 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe "a DB artist outside the routed slug list" do
+    let(:synthia) { create(:artist, name: "Synthia", slug: "synthia", genre: "Synth Pop") }
+    let!(:fast_lane) { create(:release, artist: synthia, slug: "fast-lane", name: "Fast Lane", coming_soon: true) }
+
+    it "serves the shared catalog with its incoming release" do
+      get "/synthia/releases"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("Synthia :: RELEASES", "Fast Lane", "INCOMING")
+      expect(response.body).to include(%(href="/synthia/releases/fast-lane"))
+      expect(response.body).not_to include("No releases cataloged yet.")
+    end
+
+    it "serves the release page in its pending state and redirects its tracks there" do
+      create(:track, artist: synthia, release: fast_lane, slug: "fast-lane")
+
+      get "/synthia/releases/fast-lane"
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("SIGNAL INCOMING — TRANSMISSION PENDING")
+
+      get "/synthia/trackz/fast-lane"
+      expect(response).to redirect_to("/synthia/releases/fast-lane")
+    end
+
+    it "404s for a slug no artist has" do
+      get "/no-such-band/releases"
+      expect(response).to have_http_status(:not_found)
+
+      get "/no-such-band/releases/fast-lane"
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

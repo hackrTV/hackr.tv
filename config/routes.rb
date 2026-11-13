@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   # thecyberpulse; the xeraen redirects above cover the old paths) and
   # wavelength-zero its custom profile; the other slugs render band
   # profiles (eleven configured in BandProfile::CONFIG, the rest fall
-  # back to the not-found variant, matching the SPA). The catalog
+  # back to the Coming Soon screen). The catalog
   # (releases/trackz) is shared by all slugs. Unrouted /bio and /vidz on
   # generic slugs 404 like the SPA's client-side router did.
   artist_slugs = %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint
@@ -727,6 +727,16 @@ Rails.application.routes.draw do
   if Rails.env.development?
     get "test/404", to: proc { |_env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }
     get "test/500", to: proc { |_env| [500, {}, [File.read(Rails.public_path.join("500.html"))]] }
+  end
+
+  # Any other artist in the DB gets the profile + catalog routes the
+  # static artist_slugs list declares at the top (a profile without a
+  # BandProfile::CONFIG entry is the Coming Soon screen).
+  scope ":artist_slug", constraints: ->(req) { Artist.exists?(slug: req.path_parameters[:artist_slug]) } do
+    get "/", to: "band_profiles#show"
+    get "releases", to: "artist_catalog#releases"
+    get "releases/:id", to: "artist_catalog#release"
+    get "trackz/:id", to: "artist_catalog#track"
   end
 
   # Catch-all route for 404s (must be last)

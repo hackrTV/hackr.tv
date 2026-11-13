@@ -162,13 +162,61 @@ RSpec.describe "Band profile pages", type: :request do
     end
   end
 
-  describe "GET /the-pulse-grid (unconfigured slug)" do
-    it "renders the minimal not-found page with a 200 like the SPA" do
+  describe "GET /synthia (a DB artist outside the routed slug list)" do
+    it "renders the Coming Soon console screen with a 200" do
+      create(:artist, name: "Synthia", slug: "synthia", genre: "Synth Pop")
+
+      get "/synthia"
+
+      expect(response).to have_http_status(:ok)
+      body = response.body
+      expect(body).to include("<title>Synthia — hackr.tv</title>")
+      expect(body).to include('class="console" data-controller="terminal" data-boot="pending"')
+      expect(body).not_to include("chrome-ascii", "tui-window", "band-profile")
+      expect(body).to include("PROFILE PENDING", "SYNTH POP", "◌ PROFILE COMING SOON", "// TRANSMISSION PENDING //")
+      expect(body).to include(%(<a class="console-bar-link" href="/synthia/releases">[&gt;] RELEASES</a>))
+      expect(body).to include(%(data-command="releases" href="/synthia/releases">Releases</a>))
+      expect(body).to include(%(data-command="vault" href="/vault?filter=Synthia">Pulse Vault</a>))
+      expect(body).to include(%(data-command="fnet" href="/f/net">Fracture Network</a>))
+      expect(body).to include("(releases vault fnet home)")
+    end
+
+    it "404s for a slug no artist has" do
+      get "/no-such-band"
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "GET /the-pulse-grid (routed slug without a profile)" do
+    it "renders the Coming Soon screen under the upcased slug when no artist row exists" do
       get "/the-pulse-grid"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include('<div id="root">')
-      expect(response.body).to include("Band not found")
+      expect(response.body).to include("<title>THE-PULSE-GRID — hackr.tv</title>")
+      expect(response.body).to include("◌ PROFILE COMING SOON")
+      expect(response.body).to include(%(href="/the-pulse-grid/releases"))
+      expect(response.body).not_to include("GENRE")
+    end
+
+    it "shows the artist row's name and genre when one exists" do
+      create(:artist, name: "The Pulse Grid", slug: "the-pulse-grid", genre: "Canon")
+
+      get "/the-pulse-grid"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>The Pulse Grid — hackr.tv</title>", "◌ PROFILE COMING SOON", "CANON")
+    end
+  end
+
+  describe "GET /vault with an artist whose slug collides with the route" do
+    it "is still served by the named route" do
+      create(:artist, name: "Vault", slug: "vault")
+
+      get "/vault"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("PROFILE COMING SOON")
     end
   end
 end

@@ -96,10 +96,21 @@ minutes: 20
    artists (e.g. TR4X 4 H4X) must NOT appear here — bands only.
 10. Open a band profile page. → Band page renders (config-driven layout,
    colors, members/links as configured).
-11. Check `/the-pulse-grid` (band/canon page). → Renders.
+11. Check `/the-pulse-grid` (routed, no profile config). → The Coming
+   Soon console screen: bar with the name (the upcased slug when no
+   artist row exists), `PROFILE PENDING`, `[<] FNET` / `[>] RELEASES`;
+   ARTIST / SIGNAL `◌ PROFILE COMING SOON` rows (GENRE too when an
+   artist row exists);
+   `// TRANSMISSION PENDING //`; destinations RELEASES VAULT FNET HOME
+   and the `>` prompt. 200, no ASCII header.
+12. From `/f/net`, open Synthia (a DB artist outside the routed slug
+   list) and her `[>] RELEASES`. → `/synthia/releases` is the shared
+   catalog with Fast Lane as an INCOMING card; Fast Lane opens its
+   pending release page; `/synthia` is the Coming Soon screen with
+   `SYNTH POP`. `/no-such-band` and `/no-such-band/releases` 404.
 
 ## Steps — mobile variants
 
-12. Load `/thecyberpulse` at a phone viewport. → Usable layout (the
+13. Load `/thecyberpulse` at a phone viewport. → Usable layout (the
     dedicated mobile views were retired with the SPA; responsive layout
     must hold).
