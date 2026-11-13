@@ -10,7 +10,9 @@ minutes: 15
 1. Visit `/system-rot/releases` (any band outside the console — XERAEN's
    and The.CyberPul.se's catalogs are the console, article 13 step 5). →
    Release index for the artist: released grid + coming-soon strip;
-   registers a release-index view (achievement source) silently.
+   registers a release-index view (achievement source) silently. Any
+   artist in the DB resolves here, not only the routed slug list
+   (`/synthia/releases`, article 13 step 12); an unknown slug 404s.
 2. Open a release (`/system-rot/releases/<slug>`). → Detail page:
    cover, track list, disc length; play works.
 3. A release whose tracks are all vault-hidden must 404 here; a

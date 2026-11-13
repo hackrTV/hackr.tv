@@ -37,11 +37,6 @@
 
 .band-profile-buttons .band-profile-back-button { color: #888; }
 
-.band-profile-not-found {
-  padding: 80px 20px;
-  text-align: center;
-}
-
 @media (max-width: 767px) {
   .band-profile-container { max-width: 100%; }
 

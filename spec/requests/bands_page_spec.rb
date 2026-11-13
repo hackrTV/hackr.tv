@@ -54,6 +54,9 @@ RSpec.describe "Bands page", type: :request do
       expect(body).to include(%(data-command="02" href="/unprofiled/releases">Unprofiled</a>))
       expect(body).to include("PROFILE COMING SOON")
       expect(body).to include(%(<a class="console-bar-link" href="/unprofiled/releases">[&gt;] RELEASES</a>))
+
+      get "/unprofiled/releases"
+      expect(response).to have_http_status(:success)
     end
 
     it "shows the band's newest released cover, skipping incoming and vault-hidden releases" do

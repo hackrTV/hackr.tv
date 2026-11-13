@@ -1,0 +1,61 @@
+<%# A slug without a BandProfile::CONFIG entry: a console screen in the
+    FNet family pointing at what the artist already has (2026-11-11).
+    Locals: name. %>
+<% destinations = [
+  ["RELEASES", "/#{@slug}/releases", "Releases", "Every transmission committed to record"],
+  ["VAULT", vault_path(filter: name), "Pulse Vault", "Listen — every #{name} track in the vault"],
+  ["FNET", "/f/net", "Fracture Network", "Back to the network"],
+  ["HOME", "/", "hackr.tv", "Back to the broadcast system"]
+] %>
+
+<div class="console" data-controller="terminal" data-boot="pending"
+  data-action="keydown@document->terminal#skip click->terminal#skip">
+  <div class="console-bar console-line" data-terminal-target="line">
+    <h1 class="console-bar-title"><%= name %></h1>
+    <span class="console-bar-sub">PROFILE PENDING</span>
+    <span class="console-bar-right">
+      <%= link_to "[<] FNET", "/f/net", class: "console-bar-link" %>
+      <%= link_to "[>] RELEASES", "/#{@slug}/releases", class: "console-bar-link" %>
+    </span>
+  </div>
+
+  <div class="console-status">
+    <div class="console-status-row console-line" data-terminal-target="line">
+      <span class="console-key">ARTIST</span>
+      <span class="console-val"><%= name %></span>
+    </div>
+    <% if @artist&.genre.present? %>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">GENRE</span>
+        <span class="console-val"><%= @artist.genre.upcase %></span>
+      </div>
+    <% end %>
+    <div class="console-status-row console-line" data-terminal-target="line">
+      <span class="console-key">SIGNAL</span>
+      <span class="console-val"><span class="xt-brand">◌ PROFILE COMING SOON</span> <span class="console-dim">· the full transmission is still being decoded</span></span>
+    </div>
+  </div>
+
+  <div class="console-rule console-line" data-terminal-target="line"><span>// TRANSMISSION PENDING //</span></div>
+  <div class="xt-prose">
+    <p class="console-line" data-terminal-target="line">
+      This profile is still being assembled. Until it lands, the releases and the vault carry the signal.
+    </p>
+  </div>
+
+  <section class="console-section" aria-label="Destinations">
+    <div class="console-rule console-line" data-terminal-target="line"><span>// DESTINATIONS //</span></div>
+    <% destinations.each do |tag_name, href, label, desc| %>
+      <div class="console-row console-line" data-terminal-target="line">
+        <span class="console-tag">[<%= tag_name %>]</span>
+        <%= link_to label, href, class: "console-link", data: {command: tag_name.downcase} %>
+        <span class="console-desc"><%= desc %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <div class="console-rule console-line" data-terminal-target="line"><span>// THE SIGNAL CONTINUES //</span></div>
+  <%= render "shared/console_prompt", hint: safe_join([
+    "type a tag ", tag.span("(#{destinations.map { |tag_name, *| tag_name.downcase }.join(" ")})", class: "console-dim"), " · enter · ? help"
+  ]) %>
+</div>
