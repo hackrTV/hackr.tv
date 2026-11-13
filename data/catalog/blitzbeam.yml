@@ -1,6 +1,8 @@
 artist:
   name: "BlitzBeam+"
   genre: "Hypertrance (2000s Style)"
+  profile_path: "/blitzbeam"
+  description: "Maximum velocity hypertrance. SPEED IS LIFE! Faster than the RIDE can track."
 
 releases:
   - slug: maximum-velocity

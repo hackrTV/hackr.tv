@@ -1,12 +1,61 @@
-<%# The artist record's fields as console status rows (ConsoleFormBuilder
-    rc_* rows). Locals: f, artist. %>
-<div class="console-status">
-  <%= f.rc_text_field :name, required: true, autocomplete: "off" %>
-  <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots",
-    hint: "/#{artist.slug.presence || "slug"} · lowercase, hyphens · the public pages are routed per slug" %>
-  <%= f.rc_select :artist_type, Artist::ARTIST_TYPES.map { |t| [t.upcase, t] }, {}, label: "TYPE",
-    hint: "BAND is listed on /f/net · OST and VOICEOVER stay off the directory (the vault is independent)" %>
-  <%= f.rc_text_field :genre, autocomplete: "off", placeholder: "Industrial / Dark Synth" %>
-  <%= f.rc_number_field :position, width: :short, min: 0,
-    hint: "lower lists first on /f/net · blank falls back to A–Z after the positioned artists" %>
+<%# Art columns (avatar, image) beside the rc_* status rows, then
+    // DESCRIPTION //. Locals: f, artist. %>
+<% avatar = root_image_ready?(artist.avatar) %>
+<% hero = root_image_ready?(artist.hero_image) %>
+<div class="cc-head">
+  <div class="rc-art-stack">
+    <div class="cc-art" <%= tag.attributes(data: peek_attrs(url_for(artist.avatar_large))) if avatar %>>
+      <% if avatar %>
+        <%= image_tag url_for(artist.avatar_standard), alt: artist.name_in_database.to_s, class: "cc-art-img" %>
+      <% else %>
+        <div class="cc-art-none" aria-hidden="true">&#9834;</div>
+      <% end %>
+    </div>
+    <span class="rc-pick" data-controller="file-pick">
+      <%= f.file_field :avatar, accept: "image/jpeg,image/png,image/webp", class: "rc-pick-input",
+        data: {file_pick_target: "input", action: "change->file-pick#changed"} %>
+      <button type="button" class="rc-btn" data-action="file-pick#open">[^] <%= avatar ? "REPLACE" : "UPLOAD" %> AVATAR</button>
+      <span class="rc-hint" data-file-pick-target="name">no file chosen</span>
+    </span>
+    <% if avatar && artist.persisted? %>
+      <span><button type="submit" form="purge-avatar" class="rc-btn rc-btn--danger">[x] REMOVE AVATAR</button></span>
+    <% end %>
+    <span class="rc-hint">square · the /f/net tile when no release cover · served at 80 / 300 / 800px</span>
+  </div>
+
+  <div class="rc-art-stack">
+    <div class="cc-art" <%= tag.attributes(data: peek_attrs(url_for(artist.hero_large))) if hero %>>
+      <% if hero %>
+        <%= image_tag url_for(artist.hero_image.variant(resize_to_fill: [360, 360], format: :jpeg, saver: {quality: 85})), alt: artist.name_in_database.to_s, class: "cc-art-img" %>
+      <% else %>
+        <div class="cc-art-none" aria-hidden="true">&#9634;</div>
+      <% end %>
+    </div>
+    <span class="rc-pick" data-controller="file-pick">
+      <%= f.file_field :hero_image, accept: "image/jpeg,image/png,image/webp", class: "rc-pick-input",
+        data: {file_pick_target: "input", action: "change->file-pick#changed"} %>
+      <button type="button" class="rc-btn" data-action="file-pick#open">[^] <%= hero ? "REPLACE" : "UPLOAD" %> IMAGE</button>
+      <span class="rc-hint" data-file-pick-target="name">no file chosen</span>
+    </span>
+    <% if hero && artist.persisted? %>
+      <span><button type="submit" form="purge-hero-image" class="rc-btn rc-btn--danger">[x] REMOVE IMAGE</button></span>
+    <% end %>
+    <span class="rc-hint">any size · the Coming Soon profile's picture · served up to 1600px</span>
+  </div>
+
+  <div class="console-status">
+    <%= f.rc_text_field :name, required: true, autocomplete: "off" %>
+    <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots",
+      hint: "/#{artist.slug.presence || "slug"} · lowercase, hyphens · the public pages are routed per slug" %>
+    <%= f.rc_select :artist_type, Artist::ARTIST_TYPES.map { |t| [t.upcase, t] }, {}, label: "TYPE",
+      hint: "BAND is listed on /f/net · OST and VOICEOVER stay off the directory (the vault is independent)" %>
+    <%= f.rc_text_field :genre, autocomplete: "off", placeholder: "Industrial / Dark Synth" %>
+    <%= f.rc_number_field :position, width: :short, min: 0,
+      hint: "lower lists first on /f/net · blank falls back to A–Z after the positioned artists" %>
+    <%= f.rc_text_field :profile_path, label: "PROFILE", autocomplete: "off", placeholder: "/#{artist.slug.presence || "slug"}",
+      hint: "the roster's [>] PROFILE and the player's Go to Artist · blank = PROFILE COMING SOON" %>
+  </div>
 </div>
+
+<%= f.rc_text_area :description, rows: 3,
+  hint: "the roster blurb on /f/net · {year} prints the lore year (#{Date.current.year + 100}) · blank = the network's default line" %>

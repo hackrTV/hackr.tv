@@ -381,6 +381,8 @@ Rails.application.routes.draw do
     # Catalog resources (full CRUD)
     resources :artists do
       member do
+        delete :purge_avatar, to: "artists#purge_avatar"
+        delete :purge_hero_image, to: "artists#purge_hero_image"
         get :history
       end
     end

@@ -16,8 +16,12 @@ minutes: 15
 2. Open a release (`/system-rot/releases/<slug>`). → Detail page:
    cover, track list, disc length; play works.
 3. A release whose tracks are all vault-hidden must 404 here; a
-   coming-soon release renders but does not play.
-4. Numeric-id URL for the same release. → Also resolves (slug-or-id).
+   coming-soon release renders but does not play. A release under
+   another artist's slug (`/system-rot/releases/<an XERAEN release
+   slug>`) → SIGNAL LOST 404, never the foreign release; same for
+   `/<artist>/trackz/<another artist's track>`.
+4. Numeric-id URL for the same release. → Also resolves (slug-or-id),
+   still only within that artist's catalog.
 
 ## Steps — trackz
 
@@ -27,7 +31,9 @@ minutes: 15
 6. A track belonging to a coming-soon release. → Redirects to the
    release page instead of rendering.
 7. Legacy `/trackz/:id` URL (old bookmark shape). → Redirects to the
-   canonical artist-scoped page.
+   canonical artist-scoped page of the track's own artist (try a XERAEN
+   track slug → `/xeraen/trackz/<slug>`); an unknown slug lands on
+   `/thecyberpulse/trackz/<slug>` SIGNAL LOST.
 
 ## Steps — vidz (VODs)
 

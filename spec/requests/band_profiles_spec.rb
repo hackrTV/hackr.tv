@@ -28,7 +28,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("← BACK TO FRACTURE NETWORK")
       expect(response.body).to include('href="/f/net"')
       expect(response.body).to include('href="/system-rot/releases"')
-      expect(response.body).to include('href="/vault?filter=system%20rot"')
+      expect(response.body).to include('href="/vault?artist=system-rot"')
       expect(response.body).to include('<span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>')
       expect(response.body).to include('<span class="chrome-mobile-only">PULSE VAULT →</span>')
     end
@@ -44,7 +44,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("VP-#{Date.current.year + 100}-INTRO")
       expect(response.body).to include("THE ARCHIVE PROJECT")
       expect(response.body).to include("[STATUS: FRAGMENTATION_AND_RECONSTRUCTION]")
-      expect(response.body).to include('href="/vault?filter=voiceprint"')
+      expect(response.body).to include('href="/vault?artist=voiceprint"')
     end
   end
 
@@ -58,7 +58,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("⚡ SPEED IS LIFE! ⚡")
       expect(response.body).to include("THE VELOCITY+ PHILOSOPHY")
       expect(response.body).to include('href="/blitzbeam/releases"')
-      expect(response.body).to include('href="/vault?filter=blitzbeam"')
+      expect(response.body).to include('href="/vault?artist=blitzbeam"')
     end
   end
 
@@ -72,7 +72,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("✦ Trance States, Unconstrained ✦")
       expect(response.body).to include("Encounter with the Deep")
       expect(response.body).to include("XERAEN in #{Date.current.year + 100} reaching back to Ashlinn in #{Date.current.year}.")
-      expect(response.body).to include('href="/vault?filter=ethereality"')
+      expect(response.body).to include('href="/vault?artist=ethereality"')
     end
   end
 
@@ -85,7 +85,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("OFFLINE")
       expect(response.body).to include("Authenticity Through Disconnection")
       expect(response.body).to include("The Unplugged Philosophy")
-      expect(response.body).to include('href="/vault?filter=offline"')
+      expect(response.body).to include('href="/vault?artist=offline"')
     end
   end
 
@@ -98,7 +98,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("[:: THE BREACH IN THE SYSTEM ::]")
       expect(response.body).to include("TACTICAL DOCTRINE")
       expect(response.body).to include("band-profile--injection-vector")
-      expect(response.body).to include('href="/vault?filter=injection%20vector"')
+      expect(response.body).to include('href="/vault?artist=injection-vector"')
     end
   end
 
@@ -110,7 +110,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("CIPHER PROTOCOL")
       expect(response.body).to include("[:: THE DATA COURIERS ::]")
       expect(response.body).to include("OPERATIONAL PARAMETERS")
-      expect(response.body).to include('href="/vault?filter=cipher%20protocol"')
+      expect(response.body).to include('href="/vault?artist=cipher-protocol"')
     end
   end
 
@@ -122,7 +122,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("APEX OVERDRIVE")
       expect(response.body).to include("⚡ EUPHORIA AS DEFIANCE ⚡")
       expect(response.body).to include("THE SUMMIT PHILOSOPHY")
-      expect(response.body).to include('href="/vault?filter=apex%20overdrive"')
+      expect(response.body).to include('href="/vault?artist=apex-overdrive"')
     end
   end
 
@@ -134,7 +134,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("NEON HEARTS (ネオンハーツ)")
       expect(response.body).to include("💖 Sugar-Coated Revolution 💖")
       expect(response.body).to include("💖 The Cute Rebellion 💖")
-      expect(response.body).to include('href="/vault?filter=neon%20hearts"')
+      expect(response.body).to include('href="/vault?artist=neon-hearts"')
     end
   end
 
@@ -146,7 +146,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("TEMPORAL BLUE DRIFT")
       expect(response.body).to include("WHAT I'M TRYING TO TELL YOU")
       expect(response.body).to include("A Hundred Years Between")
-      expect(response.body).to include('href="/vault?filter=temporal%20blue%20drift"')
+      expect(response.body).to include('href="/vault?artist=temporal-blue-drift"')
     end
   end
 
@@ -158,7 +158,7 @@ RSpec.describe "Band profile pages", type: :request do
       expect(response.body).to include("HEARTBREAK_HAVOC.SH")
       expect(response.body).to include("TACTICAL DOCTRINE")
       expect(response.body).to include("Nightcore Assault")
-      expect(response.body).to include('href="/vault?filter=heartbreak%20havoc"')
+      expect(response.body).to include('href="/vault?artist=heartbreak-havoc"')
     end
   end
 
@@ -176,9 +176,20 @@ RSpec.describe "Band profile pages", type: :request do
       expect(body).to include("PROFILE PENDING", "SYNTH POP", "◌ PROFILE COMING SOON", "// TRANSMISSION PENDING //")
       expect(body).to include(%(<a class="console-bar-link" href="/synthia/releases">[&gt;] RELEASES</a>))
       expect(body).to include(%(data-command="releases" href="/synthia/releases">Releases</a>))
-      expect(body).to include(%(data-command="vault" href="/vault?filter=Synthia">Pulse Vault</a>))
+      expect(body).to include(%(data-command="vault" href="/vault?artist=synthia">Pulse Vault</a>))
       expect(body).to include(%(data-command="fnet" href="/f/net">Fracture Network</a>))
       expect(body).to include("(releases vault fnet home)")
+      expect(body).not_to include("xt-hero")
+    end
+
+    it "shows the artist image when one is attached" do
+      synthia = create(:artist, name: "Synthia", slug: "synthia")
+      synthia.hero_image.attach(io: File.open(Rails.root.join("spec/fixtures/files/test_cover.jpg")), filename: "synthia.jpg", content_type: "image/jpeg")
+
+      get "/synthia"
+
+      expect(response.body).to include('class="xt-hero console-line"', 'class="xt-hero-img"', "/synthia.jpg")
+      expect(response.body.index("xt-hero")).to be < response.body.index("// TRANSMISSION PENDING //")
     end
 
     it "404s for a slug no artist has" do

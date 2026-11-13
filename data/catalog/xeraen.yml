@@ -1,6 +1,8 @@
 artist:
   name: "XERAEN"
   genre: "Omniwave"
+  profile_path: "/xeraen/bio"
+  description: "OMNIWAVE Genesis Vector - Every frequency at once. Covers, game scores, and originals painting the 22nd century."
 
 releases:
   - slug: encrypted-shroud

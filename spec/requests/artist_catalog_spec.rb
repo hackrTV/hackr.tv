@@ -105,6 +105,31 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("SIGNAL LOST")
     end
+
+    it "404s a release another artist owns and resolves a shared slug to this artist's own" do
+      create(:track, artist: artist, release: release)
+      other = create(:artist, name: "Other Signal", slug: "other-signal")
+      theirs = create(:release, artist: other, slug: release.slug, name: "Their Signals")
+      create(:track, artist: other, release: theirs)
+      foreign = create(:release, artist: other, name: "Foreign Cut")
+      create(:track, artist: other, release: foreign)
+
+      get "/system-rot/releases/#{release.slug}"
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("NEON SIGNALS")
+      expect(response.body).not_to include("THEIR SIGNALS")
+
+      get "/other-signal/releases/#{release.slug}"
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("THEIR SIGNALS")
+
+      get "/system-rot/releases/#{foreign.slug}"
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("SIGNAL LOST")
+
+      get "/system-rot/releases/#{foreign.id}"
+      expect(response).to have_http_status(:not_found)
+    end
   end
 
   # The catalog console (2026-10-29): a prototype on XERAEN only —
@@ -377,7 +402,7 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).to include('class="console console--thecyberpulse cc-index"')
       expect(response.body).not_to include("release-list-grid")
       expect(response.body).to include("[&lt;] TCP")
-      expect(response.body).to include("/vault?filter=The.CyberPul.se")
+      expect(response.body).to include("/vault?artist=thecyberpulse")
       expect(response.body).to include('data-command="01" href="/thecyberpulse/releases/neon-signals"')
       expect(response.body).to include('data-command="vidz"')
       expect(response.body).to include('data-command="grid"')
@@ -407,9 +432,36 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).to include("release-list-grid")
       expect(response.body).not_to include("cc-index")
     end
+
+    it "404s another artist's release and track on the console screens too" do
+      xeraen
+      track = create(:track, :with_audio, artist: artist, release: release)
+
+      get "/xeraen/releases/#{release.slug}"
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("// SIGNAL LOST //", 'class="console console--xeraen cc-release"')
+
+      get "/xeraen/trackz/#{track.slug}"
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("// SIGNAL LOST //")
+    end
   end
 
   describe "GET /:artist_slug/trackz/:id" do
+    it "404s a track another artist owns" do
+      other = create(:artist, name: "Other Signal", slug: "other-signal")
+      track = create(:track, :with_audio, artist: other, release: create(:release, artist: other), title: "Foreign Drift")
+      artist
+
+      get "/system-rot/trackz/#{track.slug}"
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("SIGNAL LOST")
+      expect(response.body).not_to include("Foreign Drift")
+
+      get "/system-rot/trackz/#{track.id}"
+      expect(response).to have_http_status(:not_found)
+    end
+
     it "renders the track with lyrics and streaming links sections" do
       track = create(:track, :with_audio, artist: artist, release: release, title: "Neon Drift",
         lyrics: "Static hums in the wires", duration: "3:45")

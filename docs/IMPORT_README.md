@@ -178,6 +178,8 @@ artist:
   name: "XERAEN"
   genre: "Omniwave"
   artist_type: "band"          # band (default), ost, or voiceover
+  profile_path: "/xeraen/bio"  # optional; blank = PROFILE COMING SOON
+  description: "OMNIWAVE…"     # optional /f/net blurb; {year} = the lore year
 
 albums:
   - slug: xordium

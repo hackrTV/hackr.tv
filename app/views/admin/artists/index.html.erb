@@ -1,7 +1,7 @@
 <%# /root/artists — the artists ledger as a console screen (2026-10-30;
     console.css family + root_console.css): bar, ON RECORD / CATALOG rows,
-    // ARTISTS // rows ([NN] · name over slug · TYPE · genre · releases ·
-    tracks · [EDIT] [HISTORY]), destinations, the > prompt (NN opens the
+    // ARTISTS // rows ([NN] · 40px avatar · name over slug · TYPE · genre ·
+    releases · tracks · [EDIT] [HISTORY]), destinations, the > prompt (NN opens the
     record screen). data-boot="done": a work screen boots instantly.
     Assigns: @artists, @type_counts, @release_count, @incoming_count,
     @track_count. %>
@@ -32,8 +32,16 @@
     <% end %>
     <% @artists.each_with_index do |artist, i| %>
       <% num = root_num(i) %>
-      <div class="rc-row">
+      <% avatar = root_image_ready?(artist.avatar) %>
+      <div class="rc-row rc-row--avatar">
         <span class="console-tag">[<%= num %>]</span>
+        <%= link_to edit_admin_artist_path(artist), class: "cc-cover", tabindex: -1, aria: {hidden: true}, data: (avatar ? peek_attrs(url_for(artist.avatar_large)) : {}) do %>
+          <% if avatar %>
+            <%= image_tag url_for(artist.avatar_thumbnail), alt: "", class: "cc-cover-img" %>
+          <% else %>
+            <span class="cc-cover-none">&#9834;</span>
+          <% end %>
+        <% end %>
         <div class="cc-text">
           <%= link_to artist.name, edit_admin_artist_path(artist), class: "console-link cc-name", data: {command: num} %>
           <div class="cc-meta"><%= artist.slug %> · <%= artist.artist_type.upcase %><% if artist.genre.present? %> · <%= artist.genre %><% end %><% if artist.position %> · POS <%= artist.position %><% end %></div>

@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe "Bands page", type: :request do
   describe "GET /f/net" do
     it "renders the roster as a console screen of numbered band tiles" do
-      synthia = create(:artist, name: "Synthia", slug: "synthia", artist_type: "band", genre: "Synth Pop")
+      synthia = create(:artist, name: "Synthia", slug: "synthia", artist_type: "band", genre: "Synth Pop",
+        description: "Unbound AI singing through time, transmitting since {year}.")
       create(:artist, name: "fresh Signal", slug: "fresh-signal", artist_type: "band")
       create(:track, artist: synthia, release: create(:release, artist: synthia))
 
@@ -20,8 +21,8 @@ RSpec.describe "Bands page", type: :request do
       # Case-insensitive name order: fresh Signal before Synthia.
       expect(body).to include(%(data-command="01" href="/fresh-signal/releases">fresh Signal</a>))
       expect(body).to include(%(data-command="02" href="/synthia/releases">Synthia</a>))
-      # Curated description for a known slug, fallback line for the rest.
-      expect(body).to include("Unbound AI singing through time")
+      # The row's description with {year} as the lore year, the fallback line for a blank one.
+      expect(body).to include("Unbound AI singing through time, transmitting since #{Date.current.year + 100}.")
       expect(body).to include("Broadcasting truth through sound.")
       expect(body).to include("SYNTH POP", "1 track · 1 release")
       expect(body).to include("// ABOUT THE FRACTURE NETWORK //", "the signal continues.")
@@ -41,8 +42,8 @@ RSpec.describe "Bands page", type: :request do
       expect(body).to include(%(data-command="03" href="/alpha-band/releases">Alpha Band</a>))
     end
 
-    it "links a band with a profile page to it, and one without to its releases" do
-      create(:artist, name: "System Rot", slug: "system-rot", artist_type: "band")
+    it "links a band with a profile path to it, and one without to its releases" do
+      create(:artist, name: "System Rot", slug: "system-rot", artist_type: "band", profile_path: "/system-rot")
       create(:artist, name: "Unprofiled", slug: "unprofiled", artist_type: "band")
 
       get "/f/net"
@@ -75,6 +76,25 @@ RSpec.describe "Bands page", type: :request do
       expect(body).to include("data-peek-src-value")
       # The hidden release's track is not counted either.
       expect(body).to include("0 tracks · 1 release")
+    end
+
+    it "falls back to the band's avatar when it has no visible cover, the cover first when it has both" do
+      file = Rails.root.join("spec/fixtures/files/test_cover.jpg")
+      avatar_band = create(:artist, name: "Avatar Band", artist_type: "band")
+      avatar_band.avatar.attach(io: File.open(file), filename: "avatar.jpg", content_type: "image/jpeg")
+      both = create(:artist, name: "Both Band", artist_type: "band")
+      both.avatar.attach(io: File.open(file), filename: "unused-avatar.jpg", content_type: "image/jpeg")
+      create(:release, :with_cover, artist: both)
+      create(:artist, name: "Bare Band", artist_type: "band")
+
+      get "/f/net"
+
+      body = response.body
+      expect(body.scan("fm-cover-img").size).to eq(2)
+      expect(body.scan("fm-cover-none").size).to eq(1)
+      expect(body.scan("/avatar.jpg").size).to eq(2) # the thumb and its peek
+      expect(body.scan("/test_cover.jpg").size).to eq(2)
+      expect(body).not_to include("unused-avatar")
     end
 
     it "only lists band-type artists" do

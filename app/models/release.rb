@@ -78,9 +78,9 @@ class Release < ApplicationRecord
   # release whose tracks are all hidden from the Pulse Vault stays out.
   # Returns an Array (the reject needs the tracks).
   def self.catalog_visible(artist)
-    released.where(artist: artist)
+    released.where(artist: artist).includes(:tracks)
       .order(Arel.sql("release_date DESC NULLS LAST"))
-      .reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }
+      .reject(&:vault_hidden?)
   end
 
   def to_param

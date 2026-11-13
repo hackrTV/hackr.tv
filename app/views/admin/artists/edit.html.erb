@@ -4,9 +4,10 @@
     fields as status rows, // COMMIT // ([SAVE] [CANCEL] · [DELETE] only
     while nothing references the artist), // RELEASES // ledger rows
     opening the release screens + [+] NEW RELEASE prefilled, destinations,
-    the > prompt. The delete form is hidden at the end; its ghost button
-    points at it (form=). URLs use slug_in_database — a rejected slug
-    must not build the form's action. Assigns: @artist, @releases. %>
+    the > prompt. Hidden forms at the end: purge-avatar, purge-hero-image,
+    delete-artist; the ghost buttons point at them (form=). URLs use
+    slug_in_database — a rejected slug must not build the form's action.
+    Assigns: @artist, @releases. %>
 <% slug = @artist.slug_in_database %>
 <% content_for :title, "/root/artists/#{slug} :: #{@artist.name_in_database}" %>
 <% deletable = @artist.releases.empty? && @artist.tracks.empty? %>
@@ -54,6 +55,12 @@
   <%= render "shared/console_prompt", hint: root_prompt_hint(:music, numbers: numbers, noun: "a release number", extra: ["new"]) %>
 
   <div class="rc-hidden-forms">
+    <% if root_image_ready?(@artist.avatar) %>
+      <%= root_delete_form("purge-avatar", purge_avatar_admin_artist_path(slug), confirm: "Remove the avatar from '#{@artist.name_in_database}'?") %>
+    <% end %>
+    <% if root_image_ready?(@artist.hero_image) %>
+      <%= root_delete_form("purge-hero-image", purge_hero_image_admin_artist_path(slug), confirm: "Remove the artist image from '#{@artist.name_in_database}'?") %>
+    <% end %>
     <% if deletable %>
       <%= root_delete_form("delete-artist", admin_artist_path(slug), confirm: "Delete artist '#{@artist.name_in_database}'?") %>
     <% end %>

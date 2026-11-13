@@ -50,6 +50,25 @@ RSpec.describe Release, type: :model do
     end
   end
 
+  describe ".catalog_visible" do
+    let(:artist) { create(:artist) }
+
+    it "lists released releases newest first, dropping the all-hidden and the coming soon" do
+      older = create(:release, artist: artist, name: "Older", release_date: Date.new(2124, 1, 1))
+      create(:track, artist: artist, release: older)
+      newer = create(:release, artist: artist, name: "Newer", release_date: Date.new(2125, 1, 1))
+      create(:track, artist: artist, release: newer, show_in_pulse_vault: false)
+      create(:track, artist: artist, release: newer, track_number: 2)
+      hidden = create(:release, artist: artist, name: "Hidden")
+      create(:track, artist: artist, release: hidden, show_in_pulse_vault: false)
+      create(:release, artist: artist, name: "Soon", coming_soon: true)
+      trackless = create(:release, artist: artist, name: "Trackless", release_date: nil)
+      create(:release, artist: create(:artist), name: "Elsewhere")
+
+      expect(Release.catalog_visible(artist)).to eq([newer, older, trackless])
+    end
+  end
+
   describe "validations" do
     let(:artist) { create(:artist) }
 

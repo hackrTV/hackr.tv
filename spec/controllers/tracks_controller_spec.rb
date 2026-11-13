@@ -19,6 +19,27 @@ RSpec.describe TracksController, type: :request do
         expect(response).to redirect_to("/thecyberpulse/trackz/test-track")
         expect(response).to have_http_status(301)
       end
+
+      it "redirects to the owning artist's track path, by slug or numeric id" do
+        artist = create(:artist, slug: "xeraen")
+        track = create(:track, artist: artist, release: create(:release, artist: artist), slug: "xeraen-track")
+
+        get "/trackz/xeraen-track"
+        expect(response).to redirect_to("/xeraen/trackz/xeraen-track")
+
+        get "/trackz/#{track.id}"
+        expect(response).to redirect_to("/xeraen/trackz/#{track.id}")
+      end
+
+      it "prefers thecyberpulse when two artists share the slug" do
+        xeraen = create(:artist, slug: "xeraen")
+        tcp = create(:artist, slug: "thecyberpulse")
+        create(:track, artist: xeraen, release: create(:release, artist: xeraen), slug: "shared")
+        create(:track, artist: tcp, release: create(:release, artist: tcp), slug: "shared")
+
+        get "/trackz/shared"
+        expect(response).to redirect_to("/thecyberpulse/trackz/shared")
+      end
     end
   end
 

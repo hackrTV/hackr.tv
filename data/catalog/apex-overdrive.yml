@@ -1,6 +1,8 @@
 artist:
   name: "Apex Overdrive"
   genre: "Melodic Euphoric Hardstyle"
+  profile_path: "/apex-overdrive"
+  description: "Euphoric hardstyle, honed into a weapon. Promoting unity as power. Victory coded into every beat."
 
 releases:
   - slug: summit

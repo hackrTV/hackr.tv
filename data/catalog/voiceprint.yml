@@ -1,6 +1,8 @@
 artist:
   name: "Voiceprint"
   genre: "Melodic Drum and Bass"
+  profile_path: "/voiceprint"
+  description: "Liquid DnB archivists. Your voice is proof you exist — irreplaceable, authentic, unbreakable."
 
 releases:
   - slug: audio-archive

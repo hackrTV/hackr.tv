@@ -21,14 +21,30 @@ what you touch.
    [HISTORY]`), destinations, the prompt.
    Type a row's number at the prompt + Enter. → The artist's record
    screen opens (a full page load; the admin has no Turbo).
-2. On the record: NAME / SLUG / TYPE / GENRE / POSITION rows,
-   `// COMMIT //`, `// RELEASES //` rows for the artist + `[+] NEW
-   RELEASE`. Change GENRE, `[SAVE ARTIST]`. → Stays on the record with
-   `[OK] Artist '…' updated.`; `[HISTORY]` lists the change. Restore the
-   genre. Set POSITION to `0` on a band that sorts late alphabetically and
-   save. → The ledger row reads `POS 0`; `/f/net` lists that band as
-   `[01]`. A negative position is refused with `[ERR]`. Blank the
-   position again to restore A–Z.
+2. On the record: the AVATAR and IMAGE columns (`♪` / `▢` boxes with
+   `[^] UPLOAD AVATAR` / `[^] UPLOAD IMAGE`; after an upload the art,
+   `[^] REPLACE …` and `[x] REMOVE …`), NAME / SLUG / TYPE / GENRE /
+   POSITION / PROFILE rows, `// DESCRIPTION //`, `// COMMIT //`,
+   `// RELEASES //` rows for the artist + `[+] NEW RELEASE`. Upload a
+   square avatar and save → the record shows it (hover peeks the large
+   rendition), the ledger row carries a 40px thumb, `/f/net` uses it for a
+   band with no released cover. Upload an IMAGE → the Coming Soon profile
+   (`/<slug>` for an artist without a profile page) shows it above
+   `// TRANSMISSION PENDING //`. `[x] REMOVE …` confirms and clears each.
+   A non-image (pick "All files", choose an `.mp3`) is refused with
+   `[ERR] Avatar must be a JPEG, PNG, or WebP image` and the record
+   re-renders with the `♪` box (no 500).
+   Change GENRE, `[SAVE ARTIST]`. → Stays on
+   the record with `[OK] Artist '…' updated.`; `[HISTORY]` lists the
+   change. Restore the genre. Set POSITION to `0` on a band that sorts
+   late alphabetically and save. → The ledger row reads `POS 0`; `/f/net`
+   lists that band as `[01]`. A negative position is refused with
+   `[ERR]`. Blank the position again to restore A–Z. Edit the DESCRIPTION
+   (try `{year}` in it) and save → `/f/net` shows the new blurb with the
+   lore year; blank it → the default line. PROFILE `no-slash` or `//host` is refused
+   with `[ERR] Profile path is invalid`; `/<slug>` saves and `/f/net`
+   shows `[>] PROFILE` + the player's Go to Artist opens it; blank it →
+   `PROFILE COMING SOON`.
 3. Blank the NAME and save. → `[ERR]` reply, the form re-renders on the
    saved slug (no 404 / no broken action). `[CANCEL]` leaves.
 4. `[DELETE ARTIST]` shows only for an artist with no releases or tracks

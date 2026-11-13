@@ -1,6 +1,8 @@
 artist:
   name: "Temporal Blue Drift"
   genre: "Math Rock"
+  profile_path: "/temporal-blue-drift"
+  description: "Math rock time travel proving that even complexity can transmit beauty that the RIDE can't parse."
 
 releases:
   - slug: chronologos

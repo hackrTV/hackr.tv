@@ -44,6 +44,27 @@ RSpec.describe "Vault page", type: :request do
       expect(response.body).to include('value="neon"')
     end
 
+    it "scopes the vault to one artist with ?artist=<slug>, name as substring and all" do
+      create(:track, :with_audio, artist: artist, release: release, title: "Offline Mode")
+      offline = create(:artist, name: "Offline", slug: "offline")
+      create(:track, :with_audio, artist: offline, release: create(:release, artist: offline), title: "Dial Tone")
+
+      get "/vault", params: {artist: "offline"}
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("[:: MUSIC DISCOVERY :: OFFLINE ::]", "1 track by Offline", "Dial Tone")
+      expect(response.body).to include(%(<a href="/vault">[x] ALL TRACKS</a>))
+      expect(response.body).not_to include("Offline Mode", "ALL TRACKS ::]")
+    end
+
+    it "ignores an unknown artist slug" do
+      create(:track, :with_audio, artist: artist, release: release, title: "Neon Drift")
+
+      get "/vault", params: {artist: "no-such-band"}
+
+      expect(response.body).to include("[:: MUSIC DISCOVERY :: ALL TRACKS ::]", "Neon Drift")
+    end
+
     it "orders house artists ahead of others" do
       other = create(:artist, name: "AAA Newcomer")
       house = create(:artist, name: "XERAEN")

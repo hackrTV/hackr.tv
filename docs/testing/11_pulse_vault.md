@@ -8,7 +8,13 @@ minutes: 10
 ## Steps
 
 1. Visit `/vault`. → Track table renders with artists, titles, durations,
-   cover art; artist filter/sections present.
+   cover art; artist filter/sections present. Heading reads `ALL TRACKS`.
+   From a band profile, the Coming Soon screen or a console catalog,
+   follow its vault link (`/vault?artist=<slug>`) → heading carries the
+   artist's name, only that artist's tracks are listed (an artist named
+   "Offline" does not pull in other artists' "offline" titles), the
+   infobox offers `[x] ALL TRACKS` back to the full vault; the search box
+   still filters within. `?filter=<text>` keeps pre-filling the search box.
 2. Click a track row. → Player starts it; row indicates the playing
    track; player bar shows title/artist/cover.
 3. Let the track end (pick a short one, or seek near the end). → Queue

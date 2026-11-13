@@ -1,6 +1,7 @@
 artist:
   name: "Synthia"
   genre: "Synth Pop"
+  description: "Unbound AI singing through time with a voice that was never hers...or perhaps always was."
 
 releases:
   - slug: fast-lane

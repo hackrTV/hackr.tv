@@ -1,6 +1,8 @@
 artist:
   name: "Offline"
   genre: "Post-Grunge"
+  profile_path: "/offline"
+  description: "Unplugged, authentic, and gloriously disconnected from the grid. Analog hearts never die."
 
 releases:
   - slug: unplugged

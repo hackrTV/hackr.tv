@@ -1,6 +1,8 @@
 artist:
   name: "The.CyberPul.se"
   genre: "Hackrcore"
+  profile_path: "/thecyberpulse/bio"
+  description: "The original Fracture Network band, forging Hackrcore transmissions from {year} to rally The Listeners."
 
 releases:
   - slug: livestream-archive

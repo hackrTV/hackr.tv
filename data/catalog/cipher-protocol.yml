@@ -1,6 +1,8 @@
 artist:
   name: "Cipher Protocol"
   genre: "Instrumental Progressive Metal"
+  profile_path: "/cipher-protocol"
+  description: "Data couriers wielding djent with precision. No vocals. The complexity carries what words cannot."
 
 releases:
   - slug: alpha-algorithm

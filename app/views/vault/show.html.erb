@@ -5,10 +5,14 @@
     <fieldset class="vault-fieldset">
       <legend class="center vault-legend">hackr.fm :: PULSE VAULT</legend>
 
-      <h2 class="vault-heading">[:: MUSIC DISCOVERY :: ALL TRACKS ::]</h2>
+      <h2 class="vault-heading">[:: MUSIC DISCOVERY :: <%= @artist ? @artist.name.upcase : "ALL TRACKS" %> ::]</h2>
 
       <div class="vault-infobox">
-        <p><%= @tracks.size %> / <%= @tracks.size %> tracks available for streaming | Browse by artist, discover by genre, experience the resistance</p>
+        <% if @artist %>
+          <p><%= pluralize(@tracks.size, "track") %> by <%= @artist.name %> | <%= link_to "[x] ALL TRACKS", vault_path %></p>
+        <% else %>
+          <p><%= @tracks.size %> / <%= @tracks.size %> tracks available for streaming | Browse by artist, discover by genre, experience the resistance</p>
+        <% end %>
       </div>
 
       <%= render "shared/track_table", tracks: @tracks, filter: @filter %>

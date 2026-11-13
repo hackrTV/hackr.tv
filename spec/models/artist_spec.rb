@@ -3,14 +3,16 @@
 # Table name: artists
 # Database name: primary
 #
-#  id          :integer          not null, primary key
-#  artist_type :string           default("band"), not null
-#  genre       :string
-#  name        :string
-#  position    :integer
-#  slug        :string
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  id           :integer          not null, primary key
+#  artist_type  :string           default("band"), not null
+#  description  :text
+#  genre        :string
+#  name         :string
+#  position     :integer
+#  profile_path :string
+#  slug         :string
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
 #
 # Indexes
 #
@@ -52,6 +54,16 @@ RSpec.describe Artist, type: :model do
     end
   end
 
+  describe "profile_path" do
+    it "is blank or an absolute path, and stores a blank as nil" do
+      expect(build(:artist, profile_path: nil)).to be_valid
+      expect(build(:artist, profile_path: "/system-rot")).to be_valid
+      expect(build(:artist, profile_path: "system-rot")).not_to be_valid
+      expect(build(:artist, profile_path: "//other.example/x")).not_to be_valid
+      expect(build(:artist, profile_path: "  ").profile_path).to be_nil
+    end
+  end
+
   describe ".ordered" do
     it "lists positioned artists by position, then the rest by name case-insensitively" do
       zed = create(:artist, name: "Zed", position: 1)
@@ -75,6 +87,34 @@ RSpec.describe Artist, type: :model do
     it "has many tracks" do
       association = Artist.reflect_on_association(:tracks)
       expect(association.macro).to eq(:has_many)
+    end
+  end
+
+  describe "images" do
+    it "attaches an avatar and a hero image with their renditions" do
+      artist = create(:artist)
+      file = Rails.root.join("spec/fixtures/files/test_cover.jpg")
+      artist.avatar.attach(io: File.open(file), filename: "avatar.jpg", content_type: "image/jpeg")
+      artist.hero_image.attach(io: File.open(file), filename: "hero.jpg", content_type: "image/jpeg")
+
+      expect(artist.avatar).to be_attached
+      expect(artist.hero_image).to be_attached
+      expect(artist.avatar_thumbnail.variation.transformations).to include(resize_to_fill: [80, 80])
+      expect(artist.avatar_standard.variation.transformations).to include(resize_to_fill: [300, 300])
+      expect(artist.avatar_large.variation.transformations).to include(resize_to_limit: [800, 800])
+      expect(artist.hero_large.variation.transformations).to include(resize_to_limit: [1600, 1600])
+    end
+
+    it "refuses an avatar or hero image that is not a JPEG, PNG or WebP" do
+      artist = create(:artist)
+      file = Rails.root.join("spec/fixtures/files/test_audio.mp3")
+      artist.avatar.attach(io: File.open(file), filename: "avatar.mp3", content_type: "audio/mpeg")
+      artist.hero_image.attach(io: File.open(file), filename: "hero.mp3", content_type: "audio/mpeg")
+
+      expect(artist.errors[:avatar]).to include("must be a JPEG, PNG, or WebP image")
+      expect(artist.errors[:hero_image]).to include("must be a JPEG, PNG, or WebP image")
+      expect(artist.reload.avatar).not_to be_attached
+      expect(artist.hero_image).not_to be_attached
     end
   end
 
