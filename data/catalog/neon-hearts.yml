@@ -1,6 +1,8 @@
 artist:
   name: "Neon Hearts (ネオンハーツ)"
   genre: "J-Pop"
+  profile_path: "/neon-hearts"
+  description: "Kawaii brilliance carrying truth in candy-coated hooks. J-Pop that means more than it seems."
 
 releases:
   - slug: saccharine

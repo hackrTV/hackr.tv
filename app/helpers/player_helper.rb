@@ -1,25 +1,8 @@
 module PlayerHelper
-  # Ported verbatim from utils/artistPaths.ts — artists with a profile
-  # page. Unknown slugs return "" (context-menu item disabled).
-  ARTIST_PROFILE_PATHS = {
-    "xeraen" => "/xeraen/bio",
-    "thecyberpulse" => "/thecyberpulse/bio",
-    "system-rot" => "/system-rot",
-    "wavelength-zero" => "/wavelength-zero",
-    "voiceprint" => "/voiceprint",
-    "temporal-blue-drift" => "/temporal-blue-drift",
-    "injection-vector" => "/injection-vector",
-    "cipher-protocol" => "/cipher-protocol",
-    "blitzbeam" => "/blitzbeam",
-    "apex-overdrive" => "/apex-overdrive",
-    "ethereality" => "/ethereality",
-    "neon-hearts" => "/neon-hearts",
-    "offline" => "/offline",
-    "heartbreak-havoc" => "/heartbreak-havoc"
-  }.freeze
-
+  # "" when the artist has no profile page (the player's Go to Artist is
+  # disabled; the roster says PROFILE COMING SOON).
   def artist_profile_path_for(artist)
-    ARTIST_PROFILE_PATHS[artist.slug.to_s] || ""
+    artist.profile_path.to_s
   end
 
   # Single source of truth for the player row contract (Phase 4): every

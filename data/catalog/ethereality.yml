@@ -1,6 +1,8 @@
 artist:
   name: "Ethereality"
   genre: "Classic Vocal Trance"
+  profile_path: "/ethereality"
+  description: "Classic vocal trance. Beauty so deep the RIDE cannot follow where it leads."
 
 releases:
   - slug: transcendency

@@ -6,10 +6,10 @@ class Admin::ArtistsController < Admin::ApplicationController
 
   versionable Artist, find_by: :slug
 
-  before_action :set_artist, only: %i[show edit update destroy]
+  before_action :set_artist, only: %i[show edit update destroy purge_avatar purge_hero_image]
 
   def index
-    @artists = Artist.order(:name).includes(:tracks, :releases)
+    @artists = Artist.order(:name).includes(:tracks, :releases).with_attached_avatar
     @type_counts = @artists.group_by(&:artist_type).transform_values(&:size)
     @release_count = Release.count
     @incoming_count = Release.where(coming_soon: true).count
@@ -62,6 +62,18 @@ class Admin::ArtistsController < Admin::ApplicationController
     end
   end
 
+  def purge_avatar
+    @artist.avatar.purge
+    set_flash_success("Avatar removed from '#{@artist.name}'.")
+    redirect_to edit_admin_artist_path(@artist)
+  end
+
+  def purge_hero_image
+    @artist.hero_image.purge
+    set_flash_success("Artist image removed from '#{@artist.name}'.")
+    redirect_to edit_admin_artist_path(@artist)
+  end
+
   private
 
   def set_artist
@@ -76,6 +88,6 @@ class Admin::ArtistsController < Admin::ApplicationController
   end
 
   def artist_params
-    params.require(:artist).permit(:name, :slug, :genre, :artist_type, :position)
+    params.require(:artist).permit(:name, :slug, :genre, :artist_type, :position, :profile_path, :description, :avatar, :hero_image)
   end
 end

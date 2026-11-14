@@ -1,6 +1,8 @@
 artist:
   name: "Wavelength Zero"
   genre: "Emotional Atmospheric Metal"
+  profile_path: "/wavelength-zero"
+  description: "Where technical precision meets raw emotion in perfect restorative atmospheric harmony."
 
 releases:
   - slug: zero-light

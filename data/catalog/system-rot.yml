@@ -1,6 +1,8 @@
 artist:
   name: "System Rot"
   genre: "Hardcore Punk"
+  profile_path: "/system-rot"
+  description: "Raw. Uncompromising. Punk that tears down the manufactured and lays bare what's beneath."
 
 releases:
   - slug: street-level

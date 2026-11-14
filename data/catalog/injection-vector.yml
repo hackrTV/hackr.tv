@@ -1,6 +1,8 @@
 artist:
   name: "Injection Vector"
   genre: "Deathcore"
+  profile_path: "/injection-vector"
+  description: "Physical infiltration specialists. When stealth fails, deathcore brutality prevails."
 
 releases:
   - slug: physical-layer

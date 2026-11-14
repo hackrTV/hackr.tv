@@ -1,6 +1,8 @@
 artist:
   name: "heartbreak_havoc.sh"
   genre: "Nightcore"
+  profile_path: "/heartbreak-havoc"
+  description: "Heartbreak at Nightcore speed. Real love that the RIDE was never built to contain."
 
 releases:
   - slug: execute

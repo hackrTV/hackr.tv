@@ -99,6 +99,7 @@
 .rc-row { display: grid; grid-template-columns: var(--rc-cols, 5ch minmax(0, 1fr) 12ch 12ch auto); gap: 0 12px; align-items: center; padding: 2px 8px; }
 .rc-row .console-tag, .rc-track .console-tag { grid-area: auto; }
 .rc-row--cover { --rc-cols: 5ch 40px minmax(0, 1fr) 14ch auto; }
+.rc-row--avatar { --rc-cols: 5ch 40px minmax(0, 1fr) 12ch 12ch auto; }
 /* The head row keeps the rows' font size — --rc-cols is in ch, which resolves against the row's own font — and sets the small type on its cells. */
 .rc-row--head { color: var(--fg-faint); }
 .rc-row--head > * { font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -346,6 +347,7 @@
   .rc-row .rc-cell:not(.rc-links) { display: none; }
   .rc-row--head { display: none; }
   .rc-row--cover { grid-template-columns: 5ch 40px minmax(0, 1fr) auto; }
+  .rc-row--avatar { grid-template-columns: 5ch 40px minmax(0, 1fr) auto; }
   .rc-track { grid-template-columns: 3ch minmax(0, 1fr) 6ch auto; }
   .rc-track--cover { grid-template-columns: 5ch 40px minmax(0, 1fr) 6ch auto; }
   .rc-track .rc-cell:not(.rc-links):not(.rc-track-time) { display: none; }

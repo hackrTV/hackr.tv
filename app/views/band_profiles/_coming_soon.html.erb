@@ -3,7 +3,7 @@
     Locals: name. %>
 <% destinations = [
   ["RELEASES", "/#{@slug}/releases", "Releases", "Every transmission committed to record"],
-  ["VAULT", vault_path(filter: name), "Pulse Vault", "Listen — every #{name} track in the vault"],
+  ["VAULT", vault_path(artist: @slug), "Pulse Vault", "Listen — every #{name} track in the vault"],
   ["FNET", "/f/net", "Fracture Network", "Back to the network"],
   ["HOME", "/", "hackr.tv", "Back to the broadcast system"]
 ] %>
@@ -35,6 +35,12 @@
       <span class="console-val"><span class="xt-brand">◌ PROFILE COMING SOON</span> <span class="console-dim">· the full transmission is still being decoded</span></span>
     </div>
   </div>
+
+  <% if @artist&.hero_image&.attached? %>
+    <div class="xt-hero console-line" data-terminal-target="line">
+      <%= image_tag url_for(@artist.hero_large), alt: name, class: "xt-hero-img" %>
+    </div>
+  <% end %>
 
   <div class="console-rule console-line" data-terminal-target="line"><span>// TRANSMISSION PENDING //</span></div>
   <div class="xt-prose">

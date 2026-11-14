@@ -4,7 +4,7 @@ class BandsController < ApplicationController
   include GridAuthentication
 
   def index
-    @artists = Artist.bands.ordered.to_a
+    @artists = Artist.bands.ordered.with_attached_avatar.to_a
     @releases_by_artist = Release.released.where(artist_id: @artists.map(&:id))
       .includes(:tracks, cover_image_attachment: :blob)
       .order(Arel.sql("release_date DESC NULLS LAST"))

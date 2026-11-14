@@ -69,6 +69,9 @@ RSpec.describe "Admin artists", type: :request do
     body = response.body
     expect(body).to include('value="XERAEN"')
     expect(body).to include('action="/root/artists/xeraen"')
+    expect(body).to include('name="artist[profile_path]"', "// DESCRIPTION //", 'name="artist[description]"')
+    expect(body).to include('name="artist[avatar]"', "[^] UPLOAD AVATAR", 'name="artist[hero_image]"', "[^] UPLOAD IMAGE")
+    expect(body).not_to include('form="purge-avatar"', 'form="purge-hero-image"')
     expect(body).to include("// RELEASES //")
     expect(body).to include("OMNIWAVE GENESIS")
     expect(body).to include("HIDDEN") # every track vault-hidden
@@ -95,13 +98,73 @@ RSpec.describe "Admin artists", type: :request do
     create(:artist, slug: "fresh-act", genre: nil)
     log_in!(admin)
 
-    patch "/root/artists/fresh-act", params: {artist: {name: "Fresh Act", slug: "fresh-act", artist_type: "ost", genre: "Noise"}}
+    attrs = {name: "Fresh Act", slug: "fresh-act", artist_type: "ost", genre: "Noise", profile_path: " /fresh-act ", description: "Noise since {year}."}
+    patch "/root/artists/fresh-act", params: {artist: attrs}
 
     expect(response).to redirect_to("/root/artists/fresh-act/edit")
     follow_redirect!
     expect(response.body).to include("[OK]")
     expect(response.body).to include(ERB::Util.html_escape("Artist 'Fresh Act' updated."))
-    expect(Artist.find_by(slug: "fresh-act")).to have_attributes(artist_type: "ost", genre: "Noise")
+    expect(Artist.find_by(slug: "fresh-act")).to have_attributes(artist_type: "ost", genre: "Noise",
+      profile_path: "/fresh-act", description: "Noise since {year}.")
+  end
+
+  it "uploads, shows and purges the avatar and the artist image" do
+    create(:artist, slug: "fresh-act", name: "Fresh Act")
+    log_in!(admin)
+
+    get "/root/artists"
+    expect(response.body).to include('class="rc-row rc-row--avatar"', "cc-cover-none")
+
+    images = {avatar: fixture_file_upload("test_cover.jpg", "image/jpeg"), hero_image: fixture_file_upload("test_cover.jpg", "image/jpeg")}
+    patch "/root/artists/fresh-act", params: {artist: images}
+    expect(response).to redirect_to("/root/artists/fresh-act/edit")
+    artist = Artist.find_by(slug: "fresh-act")
+    expect(artist.avatar).to be_attached
+    expect(artist.hero_image).to be_attached
+
+    follow_redirect!
+    body = response.body
+    expect(body).to include("[^] REPLACE AVATAR", "[^] REPLACE IMAGE", 'class="cc-art-img"')
+    expect(body).to include('form="purge-avatar"', 'id="purge-avatar"', "/root/artists/fresh-act/purge_avatar")
+    expect(body).to include('form="purge-hero-image"', 'id="purge-hero-image"', "/root/artists/fresh-act/purge_hero_image")
+
+    get "/root/artists"
+    expect(response.body).to include('class="cc-cover-img"')
+
+    delete "/root/artists/fresh-act/purge_avatar"
+    expect(response).to redirect_to("/root/artists/fresh-act/edit")
+    expect(artist.reload.avatar).not_to be_attached
+    expect(artist.hero_image).to be_attached
+
+    delete "/root/artists/fresh-act/purge_hero_image"
+    expect(response).to redirect_to("/root/artists/fresh-act/edit")
+    expect(artist.reload.hero_image).not_to be_attached
+  end
+
+  it "refuses an avatar that is not an image and re-renders without a preview" do
+    create(:artist, slug: "fresh-act", name: "Fresh Act")
+    log_in!(admin)
+
+    patch "/root/artists/fresh-act", params: {artist: {avatar: fixture_file_upload("test_audio.mp3", "audio/mpeg")}}
+
+    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response.body).to include("[ERR]", "Avatar must be a JPEG, PNG, or WebP image", "[^] UPLOAD AVATAR")
+    expect(Artist.find_by(slug: "fresh-act").avatar).not_to be_attached
+  end
+
+  it "refuses a profile path that is not absolute, and blanks one back to nil" do
+    create(:artist, slug: "fresh-act", profile_path: "/fresh-act")
+    log_in!(admin)
+
+    patch "/root/artists/fresh-act", params: {artist: {profile_path: "fresh-act"}}
+    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response.body).to include("[ERR]", "Profile path is invalid")
+    expect(Artist.find_by(slug: "fresh-act").profile_path).to eq("/fresh-act")
+
+    patch "/root/artists/fresh-act", params: {artist: {profile_path: ""}}
+    expect(response).to redirect_to("/root/artists/fresh-act/edit")
+    expect(Artist.find_by(slug: "fresh-act").profile_path).to be_nil
   end
 
   it "saves a position from the record's POSITION row and prints it on the ledger" do

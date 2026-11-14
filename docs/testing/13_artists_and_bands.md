@@ -89,9 +89,12 @@ minutes: 20
    SIGNAL rows, `// ROSTER //` of `[NN]` band tiles — bands with a
    POSITION set in `/root/artists` first, lowest first, then the rest in
    case-insensitive name order (64px
-   newest released cover, or a `♪` box for a band with none; green name;
-   description; cyan genre · tracks · releases; `[>] PROFILE` or
-   `PROFILE COMING SOON`, `[>] RELEASES`), the about paragraph, the
+   newest released cover, else the AVATAR uploaded on
+   `/root/artists/<slug>/edit`, else a `♪` box; green name;
+   the DESCRIPTION from `/root/artists/<slug>/edit`, or `Broadcasting
+   truth through sound.` when blank, with `{year}` printed as the lore
+   year; cyan genre · tracks · releases; `[>] PROFILE` when the record
+   has a PROFILE path, else `PROFILE COMING SOON`; `[>] RELEASES`), the about paragraph, the
    destinations and the `>` prompt (`01` opens the first band). OST-type
    artists (e.g. TR4X 4 H4X) must NOT appear here — bands only.
 10. Open a band profile page. → Band page renders (config-driven layout,
@@ -100,7 +103,8 @@ minutes: 20
    Soon console screen: bar with the name (the upcased slug when no
    artist row exists), `PROFILE PENDING`, `[<] FNET` / `[>] RELEASES`;
    ARTIST / SIGNAL `◌ PROFILE COMING SOON` rows (GENRE too when an
-   artist row exists);
+   artist row exists); the artist's IMAGE (any aspect, up to 720px wide)
+   when one is uploaded on the record, nothing otherwise;
    `// TRANSMISSION PENDING //`; destinations RELEASES VAULT FNET HOME
    and the `>` prompt. 200, no ASCII header.
 12. From `/f/net`, open Synthia (a DB artist outside the routed slug

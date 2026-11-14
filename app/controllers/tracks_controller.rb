@@ -7,8 +7,13 @@ class TracksController < ApplicationController
     redirect_to "/thecyberpulse/releases", status: 301
   end
 
-  # Legacy redirect for /trackz/:id -> /thecyberpulse/trackz/:id
+  # Legacy redirect for /trackz/:id -> /<owning artist>/trackz/:id; TCP wins
+  # a shared slug, and an unknown id lands on TCP's SIGNAL LOST.
   def legacy_redirect_show
-    redirect_to "/thecyberpulse/trackz/#{params[:id]}", status: 301
+    id = params[:id].to_s
+    owners = Track.joins(:artist).where(slug: id).pluck("artists.slug")
+    owners = Track.joins(:artist).where(id: id).pluck("artists.slug") if owners.empty? && id.match?(/\A\d+\z/)
+    owner = owners.include?("thecyberpulse") ? "thecyberpulse" : owners.first || "thecyberpulse"
+    redirect_to "/#{owner}/trackz/#{id}", status: 301
   end
 end

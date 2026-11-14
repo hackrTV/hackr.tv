@@ -10,14 +10,14 @@ module ArtistConsoleHelper
   # [TAG, href, name, description] per artist. The first row is the
   # artist's home (its tag is the "[<]" label on the catalog screens); the
   # tag doubles as the prompt command (the terminal controller reads
-  # a[data-command]). The vault filter is the artist's display name — the
-  # vault's track filter is a case-insensitive substring match.
+  # a[data-command]). The vault row scopes the vault to the artist
+  # (VaultController ?artist=<slug>).
   CONSOLE_DESTINATIONS = {
     "xeraen" => [
       ["XERAEN", "/xeraen", "XERAEN", "The operative record"],
       ["BIO", "/xeraen/bio", "Bio", "The story behind the broadcasts. How a systems architect broke time open and what he lost doing it."],
       ["RELEASES", "/xeraen/releases", "Releases", "Every transmission committed to record. Hardcore fury to OMNIWAVE and everything between."],
-      ["VAULT", "/vault?filter=xeraen", "Pulse Vault", "Listen — every XERAEN track in the vault"],
+      ["VAULT", "/vault?artist=xeraen", "Pulse Vault", "Listen — every XERAEN track in the vault"],
       ["TCP", "/thecyberpulse", "The.CyberPul.se", "Flagship Standard Bearers of the Hackrs of CyberSpace"],
       ["FNET", "/f/net", "Fracture Network", "Back to the network"]
     ],
@@ -26,7 +26,7 @@ module ArtistConsoleHelper
       ["BIO", "/thecyberpulse/bio", "Bio", "Who they are. How this started. What it costs them to keep transmitting."],
       ["RELEASES", "/thecyberpulse/releases", "Releases", "Albums, EPs and singles from across the timeline. Every transmission committed to record."],
       ["VIDZ", "/thecyberpulse/vidz", "Vidz", "Visual transmissions — live operations, broadcasts and archived footage"],
-      ["VAULT", "/vault?filter=the.cyberpul.se", "Pulse Vault", "Listen — every The.CyberPul.se track in the vault"],
+      ["VAULT", "/vault?artist=thecyberpulse", "Pulse Vault", "Listen — every The.CyberPul.se track in the vault"],
       ["GRID", "/grid", "The Pulse Grid", "Where operators train, plan and execute. You thought you were playing."],
       ["XERAEN", "/xeraen", "XERAEN", "The voice behind the broadcast — his operative record"],
       ["FNET", "/f/net", "Fracture Network", "Back to the network"]

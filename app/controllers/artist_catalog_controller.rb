@@ -47,14 +47,16 @@ class ArtistCatalogController < ApplicationController
 
   # GET /:artist_slug/releases/:id
   def release
-    # Slug-or-id lookup mirroring Api::ReleasesController#show (the slug
-    # namespace is global there too — the artist segment is cosmetic).
-    @release = Release.includes(:artist).find_by(slug: params[:id])
-    @release ||= Release.includes(:artist).find_by(id: params[:id]) if numeric_id?
+    # Slug-or-id lookup inside this artist's catalog: release slugs are
+    # unique per artist, and another artist's release is unknown here.
+    @artist = Artist.find_by(slug: params[:artist_slug])
+    scope = Release.includes(:artist).where(artist: @artist)
+    @release = scope.find_by(slug: params[:id])
+    @release ||= scope.find_by(id: params[:id]) if numeric_id?
 
     # Hidden-from-vault releases 404 like the API; React rendered its
     # SIGNAL LOST state for both that and unknown ids.
-    @release = nil if @release && hidden_from_vault?(@release)
+    @release = nil if @release && !@release.coming_soon && @release.vault_hidden?
 
     if @release.nil?
       render (console_catalog? ? :console_release : :release), status: :not_found
@@ -87,12 +89,11 @@ class ArtistCatalogController < ApplicationController
 
   # GET /:artist_slug/trackz/:id
   def track
-    @track = Track.includes(:artist, :hackr_streams, release: {cover_image_attachment: :blob})
-      .find_by(slug: params[:id])
-    if @track.nil? && numeric_id?
-      @track = Track.includes(:artist, :hackr_streams, release: {cover_image_attachment: :blob})
-        .find_by(id: params[:id])
-    end
+    @artist = Artist.find_by(slug: params[:artist_slug])
+    scope = Track.includes(:artist, :hackr_streams, release: {cover_image_attachment: :blob})
+      .where(artist: @artist)
+    @track = scope.find_by(slug: params[:id])
+    @track ||= scope.find_by(id: params[:id]) if numeric_id?
 
     if @track.nil?
       render (console_catalog? ? :console_track : :track), status: :not_found
@@ -159,10 +160,5 @@ class ArtistCatalogController < ApplicationController
 
   def console_catalog?
     CONSOLE_CATALOG_SLUGS.include?(params[:artist_slug])
-  end
-
-  def hidden_from_vault?(release)
-    !release.coming_soon && release.tracks.any? &&
-      release.tracks.where(show_in_pulse_vault: true).none?
   end
 end

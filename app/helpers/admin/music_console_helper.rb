@@ -41,7 +41,7 @@ module Admin::MusicConsoleHelper
   def root_release_status(release)
     if release.coming_soon
       ["INCOMING", "rc-hot"]
-    elsif release.tracks.any? && release.tracks.none?(&:show_in_pulse_vault)
+    elsif release.vault_hidden?
       ["HIDDEN", "rc-off"]
     else
       ["LIVE", "rc-on"]
@@ -52,7 +52,11 @@ module Admin::MusicConsoleHelper
   # rejected upload the attachment holds an unpersisted blob and url_for
   # raises (gotchas, the emotes find).
   def root_cover_ready?(release)
-    release.cover_image.attached? && release.cover_image.blob.persisted?
+    root_image_ready?(release.cover_image)
+  end
+
+  def root_image_ready?(attachment)
+    attachment.attached? && attachment.blob.persisted?
   end
 
   def root_audio_ready?(track)

@@ -120,7 +120,9 @@ namespace :data do
         artist.assign_attributes(
           name: artist_data["name"],
           genre: artist_data["genre"],
-          artist_type: artist_data["artist_type"] || "band"
+          artist_type: artist_data["artist_type"] || "band",
+          profile_path: artist_data["profile_path"],
+          description: artist_data["description"]
         )
         artist.save!
         artists_created += 1

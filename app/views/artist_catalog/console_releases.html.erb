@@ -22,7 +22,7 @@
       <span class="console-bar-sub">RELEASES · THE RECORD</span>
       <span class="console-bar-right">
         <%= link_to "[<] #{console_home_tag(slug)}", "/#{slug}", class: "console-bar-link" %>
-        <%= link_to "[>] VAULT", vault_path(filter: @artist&.name || slug), class: "console-bar-link" %>
+        <%= link_to "[>] VAULT", vault_path(artist: slug), class: "console-bar-link" %>
       </span>
     </div>
 

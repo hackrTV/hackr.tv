@@ -19,7 +19,7 @@
           <div class="band-profile-buttons">
             <%= tui_button "← BACK TO FRACTURE NETWORK", "/f/net", class: "band-profile-back-button" %>
             <%= tui_button "RELEASES", "/#{@slug}/releases", class: "band-profile-button" %>
-            <%= tui_button "/vault?filter=#{ERB::Util.url_encode(@profile[:filter_name])}", class: "band-profile-button" do %>
+            <%= tui_button vault_path(artist: @slug), class: "band-profile-button" do %>
               <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
               <span class="chrome-mobile-only">PULSE VAULT →</span>
             <% end %>

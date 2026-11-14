@@ -44,20 +44,22 @@
       <% rows.each do |(artist, num)| %>
         <% releases = @releases_by_artist.fetch(artist.id, []) %>
         <% cover = releases.find { |r| r.cover_image.attached? } %>
+        <% thumb, large = [cover.cover_standard, cover.cover_large] if cover %>
+        <% thumb, large = [artist.avatar_standard, artist.avatar_large] if !cover && artist.avatar.attached? %>
         <% profile_path = artist_profile_path_for(artist) %>
         <% releases_path = "/#{artist.slug}/releases" %>
         <div class="fm-tile fm-tile--band console-line" data-terminal-target="line">
           <span class="console-tag">[<%= num %>]</span>
-          <%= link_to profile_path.presence || releases_path, class: "fm-cover", tabindex: -1, aria: {hidden: true}, data: (cover ? peek_attrs(url_for(cover.cover_large)) : {}) do %>
-            <% if cover %>
-              <%= image_tag url_for(cover.cover_standard), alt: "", class: "fm-cover-img" %>
+          <%= link_to profile_path.presence || releases_path, class: "fm-cover", tabindex: -1, aria: {hidden: true}, data: (thumb ? peek_attrs(url_for(large)) : {}) do %>
+            <% if thumb %>
+              <%= image_tag url_for(thumb), alt: "", class: "fm-cover-img" %>
             <% else %>
               <span class="fm-cover-none">&#9834;</span>
             <% end %>
           <% end %>
           <div class="fm-text">
             <%= link_to artist.name, profile_path.presence || releases_path, class: "fm-name", data: {command: num} %>
-            <div class="fm-desc"><%= band_description(artist.slug) %></div>
+            <div class="fm-desc"><%= band_description(artist) %></div>
             <div class="fm-meta"><% if artist.genre.present? %><span class="fm-genre"><%= artist.genre.upcase %></span> · <% end %><%= pluralize(releases.sum { |r| r.tracks.size }, "track") %> · <%= pluralize(releases.size, "release") %></div>
             <div class="fm-actions">
               <% if profile_path.present? %>
